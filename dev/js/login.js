@@ -1,0 +1,1 @@
+window.LoadedScripts['login'] = true
