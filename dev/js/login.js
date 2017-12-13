@@ -5,7 +5,11 @@ var login = new Vue({
   data: {
     showbgimg: false
   },
-  methods: {},
+  methods: {
+    trylogin: () => {
+      log('login thingy fired')
+    }
+  },
   created: () => {
     let imgloader = new Image(window.innerHeight, window.innerWidth)
     imgloader.onload = () => {

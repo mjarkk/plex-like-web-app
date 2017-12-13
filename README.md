@@ -13,11 +13,14 @@ and it's of course mobile friendly
 - Images are loading like medium's
 - And ofcourse all basic things that a server/client needs: (login, settings, etc)
 
-## How to install
-open a terminal and type:
+## How to use
+### to Install
+- open a terminal and type:
 - git clone https://github.com/mjarkk/plex-like-web-app
 - yarn install
+
 ### to Start
 - yarn start
+
 ### configure
-open in a text editor conf/servconfig.json
+open in a text editor **conf/servconfig.json**

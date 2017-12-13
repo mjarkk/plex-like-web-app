@@ -28,7 +28,7 @@ let comiple = (name) => {
     })
   } else {
     // uglify the file and place in the www/js/ direcotry
-    fs.readFile(file, 'utf8', (err, data) => {
+    fs.readFile(name, 'utf8', (err, data) => {
       let r = UglifyJS.minify(data)
       if (r.error) {
         log(`can't uglify file:`,r.error)

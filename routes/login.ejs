@@ -1,5 +1,6 @@
 <div class="login-vue">
-  <div class="input-from">
+  <form class="input-from" v-on:submit.prevent="trylogin()">
+    <a class="inf" href="https://github.com/mjarkk/plex-like-web-app">Git Repo</a>
     <h1 class="ns">login</h1>
     <div class="input">
       <label class="ns" for="login-username">Username</label>
@@ -9,6 +10,9 @@
       <label class="ns" for="login-password">Password</label>
       <input id="login-password" type="password">
     </div>
-  </div>
+    <div class="submitbtn">
+      <button type="submit" name="button">Log in</button>
+    </div>
+  </form>
   <div class="background" v-bind:class="{showbg: showbgimg}"></div>
 </div>
