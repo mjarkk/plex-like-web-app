@@ -57,4 +57,7 @@ typings/
 # dotenv environment variables file
 .env
 
+# added
 conf/servconfig.json
+www/style/*
+www/js/*

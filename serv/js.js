@@ -1,8 +1,19 @@
 const fs = require('fs-extra')
 const watch = require('node-watch')
-const UglifyJS = require("uglify-es")
+const UglifyJS = require('uglify-es')
 
 watch('./dev/js/', { recursive: true }, (evt, name) => {
+  comiple(name)
+})
+
+fs.readdir('./dev/style/', function(err, items) {
+  for (let i = 0; i < items.length; i++) {
+    let name = './dev/style/' + items[i]
+    comiple(name)
+  }
+})
+
+let comiple = (name) => {
   let to = name.replace('dev/','www/')
   if (globconf.dev) {
     // only copy the file to the www/js/ direcory this is better for debugging
@@ -22,4 +33,4 @@ watch('./dev/js/', { recursive: true }, (evt, name) => {
       }
     })
   }
-});
+}

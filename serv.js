@@ -29,14 +29,18 @@ app.use('/node', express.static('./node_modules/'))
 app.use(bodyParser.json(true))
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(compression({ threshold: 0 }))
+
+fs.ensureDirSync(dir)
 if (globconf.dev) {
   app.use(cookieParser(randomstring.generate(100)))
 } else {
   app.use(cookieParser('a'))
 }
 
-require('./serv/sass.js')
+fs.ensureDirSync('./www/js')
 require('./serv/js.js')
+fs.ensureDirSync('./www/style')
+require('./serv/sass.js')
 
 if (!fs.existsSync('./conf/servconfig.json')) {
   fs.copySync('./conf/basic-conf.json', './conf/servconfig.json')
@@ -65,7 +69,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   }
   ensuredb(['users'],0)
 
-  app.get('/', (req, res) => {
+  app.get('*', (req, res) => {
     res.render('index', {
 
     })
