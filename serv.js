@@ -1,5 +1,6 @@
 #!/usr/bin/node
 const fs = require('fs-extra')
+const aw = require('await-fs')
 const gm = require('gm').subClass({imageMagick: true})
 const colors = require('colors')
 const express = require('express')
@@ -18,6 +19,7 @@ const CryptoJS = require('crypto-js')
 const moment = require('moment')
 const MongoClient = require('mongodb').MongoClient
 const app = express()
+const officalroute = ['','/']
 
 global.log = console.log
 global.globconf = require('./conf/servconfig.json')
@@ -30,9 +32,8 @@ app.use(bodyParser.json(true))
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(compression({ threshold: 0 }))
 
-fs.ensureDirSync(dir)
 if (globconf.dev) {
-  app.use(cookieParser(randomstring.generate(100)))
+  app.use(cookieParser(randomstring.generate(200)))
 } else {
   app.use(cookieParser('a'))
 }
@@ -69,12 +70,70 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   }
   ensuredb(['users'],0)
 
-  app.get('*', (req, res) => {
-    res.render('index', {
+  app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, items) {
+    res.set('Content-Type', 'text/css')
+    let combinedfile = ''
+    const addfiles = (count) => {
+      let item = items[count]
+      if (item) {
+        fs.readFile('./www/style/' + item, 'utf8', (err, Content) => {
+          combinedfile += Content
+          addfiles(count + 1)
+        })
+      } else {
+        res.send(combinedfile)
+      }
+    }
+    addfiles(0)
+  }))
 
-    })
+  app.get('*/basic.js', (req, res) => {
+    let sendfiles = (files) => {
+      res.set('Content-Type', 'application/javascript')
+      let tosend = ''
+      let addfile = (count) => {
+        if (files[count]) {
+          fs.readFile(`./www/js/${files[count]}.js`, 'utf8',(err, content) => {
+            tosend += content
+            addfile(count + 1)
+          })
+        } else {
+          res.send(tosend)
+        }
+      }
+      addfile(0)
+    }
+    if (req.signedCookies.logedin) {
+      sendfiles([])
+    } else {
+      sendfiles(['main','login'])
+    }
   })
 
-})
+  app.get('*', (req, res, next) => {
+    // res.cookie('logedin', true, { signed: true })
+    if (officalroute.includes(req.path)) {
+      if (req.signedCookies.logedin) {
 
+        // user is logedin
+        res.render('index', {
+          jsfiles: ['main','login']
+        })
+
+      } else {
+        res.render('index', {
+          jsfiles: ['main','login']
+        })
+      }
+    } else {
+      next()
+    }
+  })
+
+  app.get('*', (req, res) => {
+    res.send('Error 404')
+  })
+
+
+})
 app.listen(globconf.port, () => log(`Server listening on port ${globconf.port}!`))

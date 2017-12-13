@@ -6,11 +6,17 @@ watch('./dev/js/', { recursive: true }, (evt, name) => {
   comiple(name)
 })
 
-fs.readdir('./dev/style/', function(err, items) {
+fs.readdir('./dev/js/', (err, items) => {
   for (let i = 0; i < items.length; i++) {
-    let name = './dev/style/' + items[i]
+    let name = `./dev/js/${items[i]}`
     comiple(name)
   }
+})
+
+// copy the vue file to the www/js direcotry
+let vuefile = (globconf.dev) ? './node_modules/vue/dist/vue.js' : './node_modules/vue/dist/vue.min.js'
+fs.copy(vuefile, './www/js/vue.js', () => {
+  log(`copied vue.js file`)
 })
 
 let comiple = (name) => {

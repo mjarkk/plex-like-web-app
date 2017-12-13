@@ -6,7 +6,8 @@ all the animations are somooth,
 auto changing resolution in movies depending on your network speed,
 all api data is secure from end to end,
 you can share everyting,
-load a page before you have even clicked it,
+load a page before you have even clicked it
+and it's of course mobile friendly
 ### Some other Goals
 - Changing theme's light, dark and maybe custom css theme's
 - Images are loading like medium's
