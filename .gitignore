@@ -59,5 +59,7 @@ typings/
 
 # added
 conf/servconfig.json
+www/style
+www/js
 www/style/*
 www/js/*
