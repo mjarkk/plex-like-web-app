@@ -84,7 +84,8 @@ x.createuser = (data, callback) => {
 // step 2:
 // data = {
 //    step: 2,
-//    teststring: 'teststring'
+//    teststring: 'teststring',
+//    username: 'username'
 // }
 x.LoginStep = (data, callback) => {
   if (data && typeof(data.step) == 'number') {
@@ -114,7 +115,34 @@ x.LoginStep = (data, callback) => {
         })
       }
     } else if (data.step == 2) {
-
+      if (typeof(data.username) == 'string' && typeof(data.teststring) == 'string') {
+        let username = data.username
+        db.collection("users").find({username: {$in:[username]}}).toArray(function(err, result) {
+          if (err || !result[0]) {
+            callback({
+              status: false,
+              why: 'User_not_found'
+            })
+          } else {
+            decrypt(data.teststring, result[0].password, (res) => {
+              if (res) {
+                callback({
+                  status: true
+                })
+              } else {
+                callback({
+                  status: false
+                })
+              }
+            })
+          }
+        })
+      } else {
+        callback({
+          status: false,
+          why: 'Username_not_defined'
+        })
+      }
     }
   } else {
     callback({
@@ -129,5 +157,14 @@ let encrypt = (ToEncrypt,key) => {
     return(CryptoJS.AES.encrypt(JSON.stringify(ToEncrypt), key).toString())
   } else {
     return(CryptoJS.AES.encrypt(ToEncrypt, key).toString())
+  }
+}
+
+let decrypt = (data, key, callback) => {
+  try {
+    let decrypted = CryptoJS.AES.decrypt(data,key).toString(CryptoJS.enc.Utf8)
+    callback(decrypted)
+  } catch (e) {
+    callback(false)
   }
 }

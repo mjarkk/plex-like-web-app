@@ -1,4 +1,24 @@
 
+let JsonFetch = (data, callback) => {
+  fetch(data.url, {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Cache': 'no-cache'
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify(data.body)
+  })
+  .then((res) => res.json())
+  .then((jsondata) => {
+    callback(false, jsondata)
+  })
+  .catch((e) => {
+    callback(true, false)
+  })
+}
+
 let PBKDF2 = (password, salt) => {
   return (CryptoJS.PBKDF2(password, salt, { keySize: 1000, iterations: 500 }).toString())
 }
@@ -39,24 +59,32 @@ self.onmessage = function (msg) {
 }
 
 let trylogin = (username, password, callback) => {
-  fetch('/getsalt', {
-    method: 'post',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Cache': 'no-cache'
-    },
-    credentials: 'same-origin',
-    body: JSON.stringify({
+  JsonFetch({
+    url: '/getsalt',
+    body: {
       username: username
-    })
-  })
-  .then((res) => res.json())
-  .then((jsondata) => {
-    if (jsondata.status) {
-      decrypt(jsondata.key, PBKDF2(password, jsondata.salt), (key) => {
-        console.log(key)
-        callback(!!key)
+    }
+  }, (err, jsondata) => {
+    if (!err && jsondata.status) {
+      const PBKF2password = PBKDF2(password, jsondata.salt)
+      decrypt(jsondata.key, PBKF2password, (key) => {
+        if (!!key) {
+          JsonFetch({
+            url: '/testlogin',
+            body: {
+              username: username,
+              teststring: encrypt(key, PBKF2password)
+            }
+          }, (err, jsondata) => {
+            if (!err) {
+              callback(!!jsondata.status)
+            } else {
+              callback(false)
+            }
+          })
+        } else {
+          callback(!!key)
+        }
       })
     } else {
       callback(false)

@@ -99,7 +99,6 @@ app.get('*/basic.js', (req, res) => {
 })
 
 app.get('*', (req, res, next) => {
-  // res.cookie('logedin', true, { signed: true })
   if (officalroute.includes(req.path)) {
     if (req.signedCookies.logedin) {
 
@@ -126,20 +125,38 @@ app.get('*', (req, res) => {
 })
 
 app.post('/getsalt', (req, res) => {
-  const username = req.body.username
-  db.LoginStep({
-    step: 1,
-    username: username
-  }, (data) => {
-    res.json(data)
-  })
+  if (req.body.username) {
+    const username = req.body.username
+    db.LoginStep({
+      step: 1,
+      username: username
+    }, (data) => {
+      res.json(data)
+    })
+  } else {
+    res.json({status: false})
+  }
+})
 
+app.post('/testlogin', (req, res) => {
+  const b = req.body
+  if (b.username && b.teststring) {
+    db.LoginStep({
+      step: 2,
+      username: b.username,
+      teststring: b.teststring
+    }, (data) => {
+      if (data.status) {
+        res.cookie('logedin', true, { signed: true })
+        res.cookie('username', b.username, { signed: true })
+        res.json({status: true})
+      } else {
+        res.json({status: false})
+      }
+    })
+  } else {
+    res.json({status: false})
+  }
 })
 
 app.listen(globconf.port, () => log(`Server listening on port ${globconf.port}!`))
-
-// db.collection("customers").insertOne({
-//
-// }, (err, dbres) => {
-//
-// })
