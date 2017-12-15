@@ -10,7 +10,8 @@ var login = new Vue({
   },
   methods: {
     trylogin: () => {
-      let vm = this
+      let vm = login
+      vm.showloginprocess = true
       fetch('/getsalt', {
         method: 'post',
         headers: {
@@ -26,20 +27,19 @@ var login = new Vue({
       .then((res) => res.json())
       .then((jsondata) => {
         log(jsondata)
+        vm.showloginprocess = false
       })
       .catch((err) => {
-        vm.showloginprocess = true
+        vm.showloginprocess = false
       })
     }
   },
   created: () => {
-
+    let imgloader = new Image()
+    imgloader.src = `https://source.unsplash.com/collection/791207/${Math.round(window.innerWidth * 1.3)}x${Math.round(window.innerHeight * 1.3)}`
+    imgloader.onload = () => {
+      document.querySelector('.login-vue').style.backgroundImage = `url(${imgloader.src})`
+      login.showbgimg = true
+    }
   }
 })
-
-let imgloader = new Image()
-imgloader.src = `https://source.unsplash.com/collection/791207/${Math.round(window.innerWidth * 1.3)}x${Math.round(window.innerHeight * 1.3)}`
-imgloader.onload = () => {
-  document.querySelector('.login-vue').style.backgroundImage = `url(${imgloader.src})`
-  login.showbgimg = true
-}

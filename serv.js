@@ -42,98 +42,91 @@ fs.ensureDirSync('./www/js')
 require('./serv/js.js')
 fs.ensureDirSync('./www/style')
 require('./serv/sass.js')
+const db = require('./serv/database.js')
+
+console.log(db.hello())
 
 if (!fs.existsSync('./conf/servconfig.json')) {
   fs.copySync('./conf/basic-conf.json', './conf/servconfig.json')
   log('created config file')
 }
-MongoClient.connect(globconf.dburl, (err, dbase) => {
-  if (err) {
-    log('no mongodb database :(')
-    process.exit()
-  }
-  let db = dbase.db(globconf.dbname)
-  let ensuredb = (arr, pos) => {
-    if (arr[pos]) {
-      db.createCollection(arr[pos],(err, res) => {
-        if (err) {
-          log(colors.red.bold('Cant create collection'))
-          db.close()
-          process.exit()
-        } else {
-          ensuredb(arr, pos + 1)
-        }
+
+app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, items) {
+  res.set('Content-Type', 'text/css')
+  let combinedfile = ''
+  const addfiles = (count) => {
+    let item = items[count]
+    if (item) {
+      fs.readFile('./www/style/' + item, 'utf8', (err, Content) => {
+        combinedfile += Content
+        addfiles(count + 1)
       })
     } else {
-      log(colors.green("Connected to database!"))
+      res.send(combinedfile)
     }
   }
-  ensuredb(['users'],0)
+  addfiles(0)
+}))
 
-  app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, items) {
-    res.set('Content-Type', 'text/css')
-    let combinedfile = ''
-    const addfiles = (count) => {
-      let item = items[count]
-      if (item) {
-        fs.readFile('./www/style/' + item, 'utf8', (err, Content) => {
-          combinedfile += Content
-          addfiles(count + 1)
+app.get('*/basic.js', (req, res) => {
+  let sendfiles = (files) => {
+    res.set('Content-Type', 'application/javascript')
+    let tosend = ''
+    let addfile = (count) => {
+      if (files[count]) {
+        fs.readFile(`./www/js/${files[count]}.js`, 'utf8',(err, content) => {
+          tosend += content
+          addfile(count + 1)
         })
       } else {
-        res.send(combinedfile)
+        res.send(tosend)
       }
     }
-    addfiles(0)
-  }))
-
-  app.get('*/basic.js', (req, res) => {
-    let sendfiles = (files) => {
-      res.set('Content-Type', 'application/javascript')
-      let tosend = ''
-      let addfile = (count) => {
-        if (files[count]) {
-          fs.readFile(`./www/js/${files[count]}.js`, 'utf8',(err, content) => {
-            tosend += content
-            addfile(count + 1)
-          })
-        } else {
-          res.send(tosend)
-        }
-      }
-      addfile(0)
-    }
-    if (req.signedCookies.logedin) {
-      sendfiles([])
-    } else {
-      sendfiles(['main','login'])
-    }
-  })
-
-  app.get('*', (req, res, next) => {
-    // res.cookie('logedin', true, { signed: true })
-    if (officalroute.includes(req.path)) {
-      if (req.signedCookies.logedin) {
-
-        // user is logedin
-        res.render('index', {
-          jsfiles: ['main','login']
-        })
-
-      } else {
-        res.render('index', {
-          jsfiles: ['main','login']
-        })
-      }
-    } else {
-      next()
-    }
-  })
-
-  app.get('*', (req, res) => {
-    res.send('Error 404')
-  })
-
-
+    addfile(0)
+  }
+  if (req.signedCookies.logedin) {
+    sendfiles([])
+  } else {
+    sendfiles(['main','login'])
+  }
 })
+
+app.get('*', (req, res, next) => {
+  // res.cookie('logedin', true, { signed: true })
+  if (officalroute.includes(req.path)) {
+    if (req.signedCookies.logedin) {
+
+      // user is logedin
+      res.render('index', {
+        jsfiles: ['main','login']
+      })
+
+    } else {
+      res.render('index', {
+        jsfiles: ['main','login']
+      })
+    }
+  } else {
+    next()
+  }
+})
+
+app.get('*', (req, res) => {
+  res.send('Error 404')
+})
+
+app.post('/getsalt', (req, res) => {
+  const username = req.body.username
+
+  res.json({
+    status: false
+  })
+})
+
 app.listen(globconf.port, () => log(`Server listening on port ${globconf.port}!`))
+
+// db.collection("customers").insertOne({
+//
+// }, (err, dbres) => {
+//
+// })
