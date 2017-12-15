@@ -57,6 +57,40 @@
       text-decoration: none
       &:hover
         text-decoration: underline
+    .loginprocess
+      height: 40px
+      width: 40px
+      margin-top: 10px
+      display: flex
+      justify-content: center
+      align-items: center
+      display: -webkit-flex
+      -webkit-justify-content: center
+      -webkit-align-items: center
+      .box
+        height: 40px
+        width: 40px
+        border-radius: 100%
+        background-color: #eee
+        display: flex
+        justify-content: center
+        align-items: center
+        display: -webkit-flex
+        -webkit-justify-content: center
+        -webkit-align-items: center
+        opacity: 0
+        .box-inside
+          height: 30px
+          width: 30px
+          border-radius: 100%
+          background-color: #ccc
+          opacity: 1
+      .show-box
+        opacity: 1
+        .box-inside
+          animation: loadinganimation 2s infinite
+          transform: scale(1,1)
+          opacity: 1
   .background
     background-color: #eee
     opacity: 1
@@ -67,3 +101,20 @@
     transition: opacity 0.4s
   .showbg
     opacity: 0.4
+
+@keyframes loadinganimation
+  0%
+    transform: scale(1,1)
+    opacity: 1
+  25%
+    transform: scale(1.3,1.3)
+    opacity: 0
+  50%
+    transform: scale(1,1)
+    opacity: 1
+  75%
+    transform: scale(1.3,1.3)
+    opacity: 0
+  100%
+    transform: scale(1,1)
+    opacity: 1

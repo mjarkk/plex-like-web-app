@@ -1,17 +1,22 @@
 <div class="login-vue">
-  <form class="input-from" v-on:submit.prevent="trylogin()">
+  <form class="input-from" v-on:submit.prevent="trylogin()" v-cloak>
     <a class="inf" href="https://github.com/mjarkk/plex-like-web-app">Git Repo</a>
     <h1 class="ns">login</h1>
-    <div class="input">
+    <div class="input" v-bind:class="{disabled: showloginprocess}">
       <label class="ns" for="login-username">Username</label>
-      <input id="login-username" type="text">
+      <input id="login-username" type="text" v-bind:disabled="showloginprocess" v-model="username">
     </div>
-    <div class="input">
+    <div class="input" v-bind:class="{disabled: showloginprocess}">
       <label class="ns" for="login-password">Password</label>
-      <input id="login-password" type="password">
+      <input id="login-password" type="password" v-bind:disabled="showloginprocess" v-model="password">
     </div>
-    <div class="submitbtn">
-      <button type="submit" name="button">Log in</button>
+    <div class="submitbtn" v-bind:class="{disabled: showloginprocess}">
+      <button type="submit" name="button" v-bind:disabled="showloginprocess">Log in</button>
+    </div>
+    <div class="loginprocess">
+      <div class="box" v-bind:class="{'show-box': showloginprocess}">
+        <div class="box-inside"></div>
+      </div>
     </div>
   </form>
   <div class="background" v-bind:class="{showbg: showbgimg}"></div>
