@@ -1196,6 +1196,10 @@ path@^0.12.7:
     process "^0.11.1"
     util "^0.10.3"
 
+pbkdf2-sha256@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/pbkdf2-sha256/-/pbkdf2-sha256-1.1.1.tgz#d4486ffc2c314cfb5cb57c28f9cb87e56fb2e13d"
+
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"

@@ -26,6 +26,7 @@
     "node-watch": "^0.5.5",
     "npm-sass": "^2.2.1",
     "path": "^0.12.7",
+    "pbkdf2-sha256": "^1.1.1",
     "randomstring": "^1.1.5",
     "sha256": "^0.2.0",
     "shelljs": "^0.7.8",

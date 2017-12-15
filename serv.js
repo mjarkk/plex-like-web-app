@@ -44,8 +44,6 @@ fs.ensureDirSync('./www/style')
 require('./serv/sass.js')
 const db = require('./serv/database.js')
 
-console.log(db.hello())
-
 if (!fs.existsSync('./conf/servconfig.json')) {
   fs.copySync('./conf/basic-conf.json', './conf/servconfig.json')
   log('created config file')
@@ -102,9 +100,12 @@ app.get('*', (req, res, next) => {
       })
 
     } else {
+
+      // user is not logedin
       res.render('index', {
         jsfiles: ['main','login']
       })
+
     }
   } else {
     next()
@@ -117,10 +118,13 @@ app.get('*', (req, res) => {
 
 app.post('/getsalt', (req, res) => {
   const username = req.body.username
-
-  res.json({
-    status: false
+  db.LoginStep({
+    step: 1,
+    username: username
+  }, (data) => {
+    res.json(data)
   })
+
 })
 
 app.listen(globconf.port, () => log(`Server listening on port ${globconf.port}!`))
