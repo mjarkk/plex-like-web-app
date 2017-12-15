@@ -22,5 +22,9 @@ and it's of course mobile friendly
 ### to Start
 - yarn start
 
+### for devolopment
+- install **nodemon**
+- inside a terminal type: yarn run dev
+
 ### configure
 open in a text editor **conf/servconfig.json**
