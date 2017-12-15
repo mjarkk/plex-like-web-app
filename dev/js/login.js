@@ -6,31 +6,25 @@ var login = new Vue({
     showbgimg: false,
     showloginprocess: false,
     username: '',
-    password: ''
+    password: '',
+    showErr: false,
+    errMsg: '--'
   },
   methods: {
     trylogin: () => {
       let vm = login
       vm.showloginprocess = true
-      fetch('/getsalt', {
-        method: 'post',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Cache': 'no-cache'
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify({
-          username: vm.username
-        })
+      WebWorker.postMessage({
+          what: 'trylogin',
+          username: vm.username,
+          password: vm.password
       })
-      .then((res) => res.json())
-      .then((jsondata) => {
-        log(jsondata)
-        vm.showloginprocess = false
-      })
-      .catch((err) => {
-        vm.showloginprocess = false
+      WebWorker.addEventListener('message', (msg) => {
+        if (msg.data.what == 'TryLoginStatus') {
+          vm.showErr = !msg.data.status
+          vm.errMsg = 'Wrong password or username!'
+          vm.showloginprocess = false
+        }
       })
     }
   },

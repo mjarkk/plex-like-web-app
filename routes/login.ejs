@@ -1,6 +1,7 @@
 <div class="login-vue">
   <form class="input-from" v-on:submit.prevent="trylogin()" v-cloak>
     <a class="inf" href="https://github.com/mjarkk/plex-like-web-app">Git Repo</a>
+    <p class="err" :style="{opacity: (showErr) ? 1 : 0}">{{ errMsg }}</p>
     <h1 class="ns">login</h1>
     <div class="input" v-bind:class="{disabled: showloginprocess}">
       <label class="ns" for="login-username">Username</label>

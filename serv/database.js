@@ -48,7 +48,7 @@ x.createuser = (data, callback) => {
     let salt = randomstring.generate(500)
     let todb = {
       salt: salt,
-      password: pbkdf2(data.password, salt, 500, 1000).toString('hex'),
+      password: CryptoJS.PBKDF2(data.password, salt, { keySize: 1000, iterations: 500 }).toString(),
       username: data.username,
       key: randomstring.generate(500)
     }
@@ -74,7 +74,6 @@ x.createuser = (data, callback) => {
     })
   }
 }
-
 
 // process of Login
 // step 1:

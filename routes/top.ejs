@@ -11,6 +11,11 @@
     <script>
       var log = console.log
       window['LoadedScripts'] = {}
+      if(typeof(Worker) !== 'undefined') {
+        window.WebWorker = new Worker('/--crypto-js.pbkdf2.worker--/basic.js')
+      } else {
+        window.WebWorker = false
+      }
     </script>
   </head>
   <body>

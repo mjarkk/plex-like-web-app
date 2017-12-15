@@ -67,26 +67,35 @@ app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, ite
 }))
 
 app.get('*/basic.js', (req, res) => {
+  const sendFilesList = []
+  let urlcut = req.path.substring(req.path.search('/--') + 3, req.path.search('--/'))
+  let urlarr = urlcut.split(".")
+  for (var i = 0; i < urlarr.length; i++) {
+    if (sendFilesList.indexOf(urlarr[i]) == -1) {
+      sendFilesList.push(urlarr[i])
+    }
+  }
   let sendfiles = (files) => {
     res.set('Content-Type', 'application/javascript')
     let tosend = ''
     let addfile = (count) => {
       if (files[count]) {
-        fs.readFile(`./www/js/${files[count]}.js`, 'utf8',(err, content) => {
-          tosend += content
+        let FilePath = files[count].replace('/','')
+        if (fs.existsSync(`./www/js/${FilePath}.js`)) {
+          fs.readFile(`./www/js/${FilePath}.js`, 'utf8',(err, content) => {
+            tosend += content
+            addfile(count + 1)
+          })
+        } else {
           addfile(count + 1)
-        })
+        }
       } else {
         res.send(tosend)
       }
     }
     addfile(0)
   }
-  if (req.signedCookies.logedin) {
-    sendfiles([])
-  } else {
-    sendfiles(['main','login'])
-  }
+  sendfiles(sendFilesList)
 })
 
 app.get('*', (req, res, next) => {

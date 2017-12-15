@@ -28,6 +28,8 @@
     -webkit-justify-content: center
     -webkit-align-items: center
     -webkit-flex-direction: column
+    .err
+      color: red
     h1
       width: 250px
       padding: 20px 20px
@@ -47,8 +49,15 @@
           outline-offset: -2px
           outline-style: auto
           outline-width: 5px
-    .submitbtn button:focus
-      outline-color: rgb(96, 8, 154)
+    .disabled
+      opacity: 0.5
+      input
+        background-color: white
+    .submitbtn
+      button:focus
+        outline-color: rgb(96, 8, 154)
+      button:disabled
+        opacity: 0.5
     .inf
       position: absolute
       top: 0px
