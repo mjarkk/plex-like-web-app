@@ -20,10 +20,22 @@ var login = new Vue({
           password: vm.password
       })
       WebWorker.addEventListener('message', (msg) => {
+        const data = msg.data
         if (msg.data.what == 'TryLoginStatus') {
-          vm.showErr = !msg.data.status
-          vm.errMsg = 'Wrong password or username!'
           vm.showloginprocess = false
+          vm.showErr = !data.status
+          if (!data.status) {
+            vm.errMsg = 'Wrong password or username!'
+          } else {
+            document.querySelector('.home-vue').style.display = 'flex'
+            const keys = data.status
+            localStorage.setItem('PBKF2password', keys.PBKF2password)
+            localStorage.setItem('key', keys.key)
+            localStorage.setItem('username', keys.username)
+            reqfile('home', () => {
+              log('logedin')
+            })
+          }
         }
       })
     }

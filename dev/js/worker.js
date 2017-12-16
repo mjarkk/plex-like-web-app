@@ -1,4 +1,3 @@
-
 let JsonFetch = (data, callback) => {
   fetch(data.url, {
     method: 'post',
@@ -16,6 +15,13 @@ let JsonFetch = (data, callback) => {
   })
   .catch((e) => {
     callback(true, false)
+  })
+}
+
+let TryLoginRes = (status) => {
+  self.postMessage({
+    what: 'TryLoginStatus',
+    status: status
   })
 }
 
@@ -43,12 +49,7 @@ let encrypt = (ToEncrypt,key) => {
 self.onmessage = function (msg) {
   switch(msg.data.what) {
     case 'trylogin':
-      trylogin(msg.data.username, msg.data.password,(status) => {
-        self.postMessage({
-          what: 'TryLoginStatus',
-          status: status
-        })
-      })
+      trylogin(msg.data.username, msg.data.password)
       break;
     case 'login':
       console.log('login')
@@ -77,17 +78,25 @@ let trylogin = (username, password, callback) => {
             }
           }, (err, jsondata) => {
             if (!err) {
-              callback(!!jsondata.status)
+              if (jsondata.status) {
+                TryLoginRes({
+                  PBKF2password: PBKF2password,
+                  username: username,
+                  key: key
+                })
+              } else {
+                TryLoginRes(false)
+              }
             } else {
-              callback(false)
+              TryLoginRes(false)
             }
           })
         } else {
-          callback(!!key)
+          TryLoginRes(false)
         }
       })
     } else {
-      callback(false)
+      TryLoginRes(false)
     }
   })
 }
