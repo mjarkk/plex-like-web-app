@@ -75,6 +75,29 @@ x.createuser = (data, callback) => {
   }
 }
 
+// encrypt some json data
+// data = {
+//   toencrypt: {/* json opbject */} OR [/* array */]
+//   username: 'username'
+// }
+x.encryptjson = (data, callback) => {
+  if (data && typeof(data.toencrypt) == 'object' && typeof(data.username) == 'string') {
+    let db = database.db(globconf.dbname)
+    db.collection("users").find({username: {$in:[data.username]}}).toArray((err, result) => {
+      if (err || !result[0]) {
+        callback({status: false})
+      } else {
+        callback({
+          status: true,
+          data: encrypt(data.toencrypt, result[0].key)
+        })
+      }
+    })
+  } else {
+    callback({status: false})
+  }
+}
+
 // process of Login
 // step 1:
 // data = {
@@ -94,7 +117,7 @@ x.LoginStep = (data, callback) => {
     if (data.step == 1) {
       if (typeof(data.username) == 'string') {
         let username = data.username
-        db.collection("users").find({username: {$in:[username]}}).toArray(function(err, result) {
+        db.collection("users").find({username: {$in:[username]}}).toArray((err, result) => {
           if (err || !result[0]) {
             callback({
               status: false,
@@ -117,7 +140,7 @@ x.LoginStep = (data, callback) => {
     } else if (data.step == 2) {
       if (typeof(data.username) == 'string' && typeof(data.teststring) == 'string') {
         let username = data.username
-        db.collection("users").find({username: {$in:[username]}}).toArray(function(err, result) {
+        db.collection("users").find({username: {$in:[username]}}).toArray((err, result) => {
           if (err || !result[0]) {
             callback({
               status: false,

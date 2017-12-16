@@ -5,12 +5,12 @@
     <meta charset="utf-8">
     <title>Site</title>
     <link rel="stylesheet" href="/style.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>[v-cloak] {display: none;}</style>
     <script>
       var log = console.log
       window['LoadedScripts'] = {}
+      window['currentpage'] = `<%= page %>`
       if(typeof(Worker) !== 'undefined') {
         window.WebWorker = new Worker('/--crypto-js.pbkdf2.worker--/basic.js')
       } else {

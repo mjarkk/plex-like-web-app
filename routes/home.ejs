@@ -1,10 +1,47 @@
 <div class="home-vue">
   <div class="side" v-cloak>
-
+    <div v-for="app in apps" class="clickicon" v-html="app.icon" v-on:click="activeapp = app.name" v-bind:class="{selected: activeapp == app.name}">
+      {{ app.icon }}
+    </div>
   </div>
   <div class="content" v-cloak>
     <div class="header">
-      <div class="first">{{ appname }}</div>
+      <div class="item">{{ appname }}</div>
+    </div>
+    <div class="header2">
+      <h1>{{ activeapp.capitalize() }}</h1>
+    </div>
+    <div class="content" v-if="activeapp == 'settings' && settingsloaded">
+      <h2>Server</h2>
+      <div class="row">
+        <p>Port</p>
+        <input type="number" placeholder="port" v-model="settings.server.port">
+      </div>
+      <div class="row">
+        <p>Dev</p>
+        <div class="switch">
+          <p v-bind:class="{active: settings.server.dev == true}" v-on:click="settings.server.dev = true">On</p>
+          <p v-bind:class="{active: settings.server.dev == false}" v-on:click="settings.server.dev = false">Off</p>
+        </div>
+      </div>
+      <div class="row">
+        <p>Images direcory</p>
+        <input type="text" placeholder="direcory" v-model="settings.server.imagedirs">
+      </div>
+      <div class="row">
+        <p>Movie direcory</p>
+        <input type="text" placeholder="direcory" v-model="settings.server.moviedirs">
+      </div>
+      <div class="row">
+        <p>Music direcory</p>
+        <input type="text" placeholder="direcory" v-model="settings.server.musicdirs">
+      </div>
+      <div class="users">
+        <div class="item" v-for="user of settings.server.users">
+          {{ user.username }}
+        </div>
+      </div>
+      <h2>Client</h2>
     </div>
   </div>
 </div>

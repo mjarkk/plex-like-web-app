@@ -19,7 +19,6 @@ const CryptoJS = require('crypto-js')
 const moment = require('moment')
 const MongoClient = require('mongodb').MongoClient
 const app = express()
-const officalroute = ['','/']
 
 global.log = console.log
 global.globconf = require('./conf/servconfig.json')
@@ -32,7 +31,7 @@ app.use(bodyParser.json(true))
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(compression({ threshold: 0 }))
 
-if (globconf.dev) {
+if (!globconf.dev) {
   app.use(cookieParser(randomstring.generate(200)))
 } else {
   app.use(cookieParser('a'))
@@ -43,6 +42,7 @@ require('./serv/js.js')
 fs.ensureDirSync('./www/style')
 require('./serv/sass.js')
 const db = require('./serv/database.js')
+const check = require('./serv/check.js')
 
 if (!fs.existsSync('./conf/servconfig.json')) {
   fs.copySync('./conf/basic-conf.json', './conf/servconfig.json')
@@ -99,19 +99,21 @@ app.get('*/basic.js', (req, res) => {
 })
 
 app.get('*', (req, res, next) => {
-  if (officalroute.includes(req.path)) {
+  if (check.checkofficalurl(req.path)) {
     if (req.signedCookies.logedin) {
 
       // user is logedin
       res.render('index', {
-        jsfiles: ['main','login']
+        jsfiles: ['main','home'],
+        page: check.getpage(req.path)
       })
 
     } else {
 
       // user is not logedin
       res.render('index', {
-        jsfiles: ['main','login']
+        jsfiles: ['main','login'],
+        page: 'login'
       })
 
     }
@@ -122,6 +124,21 @@ app.get('*', (req, res, next) => {
 
 app.get('*', (req, res) => {
   res.send('Error 404')
+})
+
+app.post('/getsettings', (req, res) => {
+  if (req.signedCookies.logedin && req.signedCookies.username) {
+    fs.readJson('./conf/servconfig.json', (err, jsondata) => {
+      db.encryptjson({
+        toencrypt: jsondata,
+        username: req.signedCookies.username
+      }, (data) => {
+        res.json(data)
+      })
+    })
+  } else {
+    res.json({status: false})
+  }
 })
 
 app.post('/getsalt', (req, res) => {

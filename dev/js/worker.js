@@ -51,8 +51,18 @@ self.onmessage = function (msg) {
     case 'trylogin':
       trylogin(msg.data.username, msg.data.password)
       break;
-    case 'login':
-      console.log('login')
+    case 'decryptjson':
+      decrypt(msg.data.todecrypt, msg.data.key, (data) => {
+        try {
+          self.postMessage({
+            what: msg.data.sideload,
+            data: JSON.parse(data),
+            status: true
+          })
+        } catch (e) {
+          self.postMessage({status: false})
+        }
+      })
       break;
     default:
       console.log('wut what do i need to do?')

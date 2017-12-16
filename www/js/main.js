@@ -1,8 +1,21 @@
 window.LoadedScripts['main'] = true
 
+let DisplayFlex = (item) => document.querySelector(item).style.display = 'flex'
+
 // check for compatibility
 if (!WebWorker || typeof(Storage) == "undefined") {
   document.querySelector('.notsupportedbrowser').style.display = 'block'
+}
+
+// display a page
+if (localStorage.getItem("key") && localStorage.getItem("username") && localStorage.getItem("PBKF2password")) {
+  let page = currentpage
+  log(page)
+  if (page == 'home') {
+    DisplayFlex('.home-vue')
+  }
+} else {
+  DisplayFlex('.login-vue')
 }
 
 reqfile = (required, callback) => {
@@ -22,4 +35,8 @@ reqfile = (required, callback) => {
   } else {
     log('Reqfile, Ilegal input:',require)
   }
+}
+
+String.prototype.capitalize = function() {
+  return this.charAt(0).toUpperCase() + this.slice(1);
 }

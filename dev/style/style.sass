@@ -7,3 +7,39 @@
   z-index: 2
   background-color: white
   display: none
+  flex-direction: row
+  flex-wrap: nowrap
+  .side
+    width: 60px
+    border-right: 2px solid #eee
+    .clickicon
+      width: 60px
+      height: 60px
+      display: flex
+      justify-content: center
+      align-items: center
+      cursor: pointer
+      svg
+        height: 40px
+        width: 40px
+        fill: rgb(0, 0, 0)
+        transform: scale(0.8, 0.8)
+        transition: transform 0.3s, fill 0.3s
+      &:hover svg
+        transform: scale(1.1, 1.1)
+    .selected svg
+      fill: rgb(113, 24, 157)
+  .content
+    width: 100%
+    .header
+      height: 50px
+      border-bottom: 2px solid #eee
+      .item
+        height: 100%
+        width: 100px
+        display: flex
+        justify-content: center
+        align-items: center
+    .header2
+      h1
+        padding: 10px 20px
