@@ -19,7 +19,7 @@ fs.readdir('./dev/style/', function(err, items) {
       sass('./' + name, { outputStyle: 'compressed' }, (err, result) => {
         if (!err) {
           log('compiled sass file: ' + items[i])
-          fs.writeFile(result.stats.entry.replace('.sass','.css').replace('/dev/style/','/www/style/'),result.css)
+          fs.writeFile(result.stats.entry.replace('.sass','.css').replace('/dev/style/','/www/style/').replace('\\dev\\style\\','\\www\\style\\'),result.css)
         }
       })
     }
