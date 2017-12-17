@@ -148,7 +148,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
                 why: 'User_not_found'
               })
             } else {
-              decrypt(data.teststring, result[0].password, (res) => {
+              decrypt(data.teststring, result[0].password + result[0].salt, (res) => {
                 if (res) {
                   callback({
                     status: true

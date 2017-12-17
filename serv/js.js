@@ -20,7 +20,7 @@ fs.copy(vuefile, './www/js/vue.js', () => {
 })
 
 let comiple = (name) => {
-  let to = name.replace('dev/','www/')
+  let to = name.replace('dev/','www/').replace('dev\\','www\\')
   if (globconf.dev) {
     // only copy the file to the www/js/ direcory this is better for debugging
     fs.copy(name, to, () => {

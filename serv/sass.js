@@ -7,7 +7,7 @@ watch('./dev/style/', { recursive: true }, (evt, name) => {
     sass('./' + name, { outputStyle: 'compressed' }, (err, result) => {
       if (!err) {
         log('compiled sass file: ' + result.stats.entry)
-        fs.writeFile(result.stats.entry.replace('.sass','.css').replace('/dev/style/','/www/style/'),result.css)
+        fs.writeFile(result.stats.entry.replace('.sass','.css').replace('/dev/style/','/www/style/').replace('\\dev\\style\\','\\www\\style\\'),result.css)
       }
     })
   }

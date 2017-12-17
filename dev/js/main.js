@@ -7,17 +7,6 @@ if (!WebWorker || typeof(Storage) == "undefined") {
   document.querySelector('.notsupportedbrowser').style.display = 'block'
 }
 
-// display a page
-if (localStorage.getItem("key") && localStorage.getItem("username") && localStorage.getItem("PBKF2password")) {
-  let page = currentpage
-  log(page)
-  if (page == 'home') {
-    DisplayFlex('.home-vue')
-  }
-} else {
-  DisplayFlex('.login-vue')
-}
-
 reqfile = (required, callback) => {
   let r = required
   if (typeof(r) == 'string') {
@@ -34,6 +23,25 @@ reqfile = (required, callback) => {
     }
   } else {
     log('Reqfile, Ilegal input:',require)
+  }
+}
+
+// display a page
+window.onload = () => {
+  if (localStorage.getItem("key") && localStorage.getItem("username") && localStorage.getItem("PBKF2password")) {
+    let page = currentpage
+    log(page)
+    if (page == 'home') {
+      DisplayFlex('.home-vue')
+    } else if (page == 'login') {
+      reqfile('login', () => {
+        DisplayFlex('.login-vue')
+      })
+    }
+  } else {
+    reqfile('login', () => {
+      DisplayFlex('.login-vue')
+    })
   }
 }
 

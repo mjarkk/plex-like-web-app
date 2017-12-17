@@ -11,7 +11,7 @@
     <div class="header2">
       <h1>{{ activeapp.capitalize() }}</h1>
     </div>
-    <div class="content" v-if="activeapp == 'settings' && settingsloaded">
+    <div class="app-content" v-if="activeapp == 'settings' && settingsloaded">
       <h2>Server</h2>
       <div class="row">
         <p>Port</p>
@@ -37,6 +37,7 @@
         <input type="text" placeholder="direcory" v-model="settings.server.musicdirs">
       </div>
       <div class="users">
+        <h3>Users</h3>
         <div class="item" v-for="user of settings.server.users">
           {{ user.username }}
         </div>

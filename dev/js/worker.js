@@ -84,7 +84,7 @@ let trylogin = (username, password, callback) => {
             url: '/testlogin',
             body: {
               username: username,
-              teststring: encrypt(key, PBKF2password)
+              teststring: encrypt(key, PBKF2password + jsondata.salt)
             }
           }, (err, jsondata) => {
             if (!err) {
