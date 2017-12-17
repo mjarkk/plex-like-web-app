@@ -21,6 +21,11 @@ const MongoClient = require('mongodb').MongoClient
 const app = express()
 
 global.log = console.log
+
+if (!fs.existsSync('./conf/servconfig.json')) {
+  fs.copySync('./conf/basic-conf.json', './conf/servconfig.json')
+  log('created config file')
+}
 global.globconf = require('./conf/servconfig.json')
 
 app.set('view engine', 'ejs')
@@ -43,11 +48,6 @@ fs.ensureDirSync('./www/style')
 require('./serv/sass.js')
 const db = require('./serv/database.js')
 const check = require('./serv/check.js')
-
-if (!fs.existsSync('./conf/servconfig.json')) {
-  fs.copySync('./conf/basic-conf.json', './conf/servconfig.json')
-  log('created config file')
-}
 
 app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, items) {
   res.set('Content-Type', 'text/css')
