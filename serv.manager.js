@@ -1,12 +1,25 @@
+#!/usr/bin/node
+
 // this script restarts the server when there are changes made to the "./conf/servconfig.json"
+
 const shell = require('shelljs')
 const fs = require('fs-extra')
-const watch = require('node-watch')
 const colors = require('colors')
-const globconf = require('./conf/servconfig.json')
+const watch = require('node-watch')
 
-// basic command
-let excommand = 'node serv.js'
+// servconfig
+let globconf = require('./conf/servconfig.json')
+
+// old content of 'conf/servconfig.json'
+let serverconffile = './conf/servconfig.json'
+let oldserverconfig = {}
+
+// nodemon files
+let nodemonfile = 'nodemon.json'
+
+fs.readJson(serverconffile, (err, data) => {
+  oldserverconfig = data
+})
 
 // check if the user has installed 'nodemon'
 if (globconf.dev && !shell.which('nodemon')) {
@@ -14,21 +27,37 @@ if (globconf.dev && !shell.which('nodemon')) {
   process.exit()
 }
 
+// a function for tricking nodemon to restart
+let restart = () => setTimeout(() => {
+  fs.readJson(nodemonfile, (err, data) => {
+    data.trickrestart = !data.trickrestart
+    fs.outputJson(nodemonfile, data, err => {
+      console.log('tried to restart the server'.green)
+    })
+  })
+}, 2000)
+
+if (globconf.dev) {
+  watch(serverconffile, { recursive: true }, (evt, name) => {
+    fs.readJson(serverconffile, (err, data) => {
+      if (data.dev !== oldserverconfig.dev) {
+        restart()
+      } else if (data.port != oldserverconfig.port) {
+        restart()
+      }
+      oldserverconfig = data
+    })
+  })
+}
+
 // if dev is true run the script using nodemon
 if (globconf.dev) {
-  excommand = 'nodemon'
+  setTimeout(() => {
+    shell.exec('nodemon', {async: true}, () => {})
+  }, 1000)
+} else {
+  // run the script forever
+  while (true) {
+    shell.exec('node serv.js')
+  }
 }
-
-// run the script forever
-while (true) {
-  shell.exec(excommand)
-}
-
-
-// for later use
-
-// setTimeout(() => {
-//   watch('./conf/servconfig.json', (evt, name) => {
-//     console.log(name)
-//   })
-// }, 2000)
