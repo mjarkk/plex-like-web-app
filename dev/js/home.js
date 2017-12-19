@@ -41,7 +41,22 @@ var home = new Vue({
     }
   },
   methods: {
-
+    updatesettings: () => {
+      let serv = home.settings.server
+      WebWorker.postMessage({
+        what: 'sendmsg',
+        location: '/updatesettings/basic',
+        key: localStorage.getItem('key'),
+        data: {
+          port: serv.port,
+          dev: serv.dev,
+          imagedirs: [serv.imagedirs],
+          moviedirs: [serv.moviedirs],
+          musicdirs: [serv.musicdirs]
+        },
+        sideload: 'updatethings'
+      })
+    }
   },
   watch: {
     activeapp: (newval, oldval) => {

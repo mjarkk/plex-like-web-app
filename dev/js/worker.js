@@ -64,6 +64,23 @@ self.onmessage = function (msg) {
         }
       })
       break;
+    case 'sendmsg':
+      //  msg.data = {
+      //    key: <string>,
+      //    location: <string (to serv url)>,
+      //    sideload: <string (callback data)>,
+      //    what: 'sendmsg',
+      //    data: <object>
+      //  }
+      JsonFetch({
+        url: msg.data.location,
+        body: {
+          tochange: encrypt(msg.data.data, msg.data.key)
+        }
+      }, (err, jsondata) => {
+        self.postMessage(jsondata)
+      })
+      break;
     default:
       console.log('wut what do i need to do?')
   }

@@ -20,14 +20,17 @@ const moment = require('moment')
 const MongoClient = require('mongodb').MongoClient
 const app = express()
 
+// replace console.log() with log()
 global.log = console.log
 
+// if there is no config file create it
 if (!fs.existsSync('./conf/servconfig.json')) {
   fs.copySync('./conf/basic-conf.json', './conf/servconfig.json')
   log('created config file')
 }
 global.globconf = require('./conf/servconfig.json')
 
+// gobal configs
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, '/routes'))
 app.use(express.static('./www/'))
@@ -36,12 +39,14 @@ app.use(bodyParser.json(true))
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(compression({ threshold: 0 }))
 
+// secure cookie config
 if (!globconf.dev) {
   app.use(cookieParser(randomstring.generate(200)))
 } else {
   app.use(cookieParser('a'))
 }
 
+// add all exstensions
 fs.ensureDirSync('./www/js')
 require('./serv/js.js')
 fs.ensureDirSync('./www/style')
@@ -49,6 +54,7 @@ require('./serv/sass.js')
 const db = require('./serv/database.js')
 const check = require('./serv/check.js')
 
+// get all content from the css file
 app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, items) {
   res.set('Content-Type', 'text/css')
   let combinedfile = ''
@@ -66,6 +72,10 @@ app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, ite
   addfiles(0)
 }))
 
+// a route to update the settings
+app.post('/updatesettings/:what', (req, res) => db.updatesettings(req,res))
+
+// a route to get all the needed javascript files
 app.get('*/basic.js', (req, res) => {
   if (req.path.indexOf('%2F') != -1 || req.path.indexOf('..') != -1) {
     res.send('"wrong url"')
@@ -102,6 +112,7 @@ app.get('*/basic.js', (req, res) => {
   }
 })
 
+// return html page
 app.get('*', (req, res, next) => {
   if (check.checkofficalurl(req.path)) {
     if (req.signedCookies.logedin) {
@@ -126,10 +137,12 @@ app.get('*', (req, res, next) => {
   }
 })
 
+// if noting is found send a 404
 app.get('*', (req, res) => {
   res.send('Error 404')
 })
 
+// a route for sending the settings config
 app.post('/getsettings', (req, res) => {
   if (req.signedCookies.logedin && req.signedCookies.username) {
     fs.readJson('./conf/servconfig.json', (err, jsondata) => {
@@ -145,6 +158,7 @@ app.post('/getsettings', (req, res) => {
   }
 })
 
+// a route to get a encrypted user key encrypted with an hashed password + salt from an user
 app.post('/getsalt', (req, res) => {
   if (req.body.username) {
     const username = req.body.username
@@ -159,6 +173,7 @@ app.post('/getsalt', (req, res) => {
   }
 })
 
+// check if a user can login
 app.post('/testlogin', (req, res) => {
   const b = req.body
   if (b.username && b.teststring) {
@@ -180,4 +195,5 @@ app.post('/testlogin', (req, res) => {
   }
 })
 
+// start the server on given port
 app.listen(globconf.port, () => log(`Server listening on port ${globconf.port}!`))

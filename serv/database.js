@@ -1,8 +1,12 @@
 const MongoClient = require('mongodb').MongoClient
 const colors = require('colors')
+const fs = require('fs-extra')
 const CryptoJS = require('crypto-js')
 const pbkdf2 = require('pbkdf2-sha256')
 const randomstring = require('randomstring')
+const globvars = {
+  serverconf: './conf/servconfig.json'
+}
 
 const x = exports
 let database
@@ -99,6 +103,50 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
 
+  // update settings route redirected from /updatesettings/{{ whatever }}
+  x.updatesettings = (req, res) => {
+    if (req.signedCookies.logedin && req.signedCookies.username && req.body.tochange) {
+      switch(req.params.what) {
+        case 'basic':
+          // change the core server config
+          DecryptUserData({
+            username: req.signedCookies.username,
+            decrypt: req.body.tochange
+          }, (data) => {
+            try {
+              if (data.status) {
+                fs.readJson(globvars.serverconf, (err, config) => {
+                  let compaire = data.data
+                  if (typeof(config.port) == typeof(Number(compaire.port))) {
+                    config.port = Number(compaire.port)
+                  }
+                  if (typeof(config.dev) == typeof(compaire.dev)) {
+                    config.dev = compaire.dev
+                  }
+                  fs.outputJson(globvars.serverconf, config, {spaces: 2}, err => {
+
+                  })
+                })
+                res.json({status: true})
+              } else {
+                res.json(nope)
+              }
+            } catch (e) {
+              res.json(nope)
+            }
+          })
+          break;
+        case 'somethingelse':
+          res.json({status: true})
+          break;
+        default:
+          res.json(nope)
+      }
+    } else {
+      res.json(nope)
+    }
+  }
+
   // process of Login
   // step 1:
   // data = {
@@ -154,9 +202,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
                     status: true
                   })
                 } else {
-                  callback({
-                    status: false
-                  })
+                  callback(nope)
                 }
               })
             }
@@ -176,6 +222,46 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
 
+  // decrypt a sended string from a user
+  //  data = {
+  //    username: <string (username of a username)>,
+  //    decrypt: <string (a decrypted string)>
+  //  }
+  //  callback = {
+  //    status: <boolean>,
+  //    data: <object OR string>
+  //  }
+  let DecryptUserData = (data, callback) => {
+    if (typeof(data.username) == 'string' && typeof(data.decrypt) == 'string') {
+      db.collection("users").find({username: {$in:[data.username]}}).toArray((err, result) => {
+        if (err || !result[0]) {
+          callback(nope)
+        } else {
+          decrypt(data.decrypt, result[0].key, (data) => {
+            if (!data) {
+              callback(nope)
+            } else {
+              try {
+                callback({
+                  status: true,
+                  data: JSON.parse(data)
+                })
+              } catch (e) {
+                callback({
+                  status: true,
+                  data: data
+                })
+              }
+            }
+          })
+        }
+      })
+    } else {
+      callback({status: false})
+    }
+  }
+
+  // encrypt function
   let encrypt = (ToEncrypt,key) => {
     if (typeof(ToEncrypt) == 'object') {
       return(CryptoJS.AES.encrypt(JSON.stringify(ToEncrypt), key).toString())
@@ -184,6 +270,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
 
+  // decrypt function
   let decrypt = (data, key, callback) => {
     try {
       let decrypted = CryptoJS.AES.decrypt(data,key).toString(CryptoJS.enc.Utf8)
@@ -192,5 +279,8 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
       callback(false)
     }
   }
+
+  // the nope response
+  const nope = {status: false}
 
 })

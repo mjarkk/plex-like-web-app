@@ -4,8 +4,7 @@
   "description": "a plex like web app",
   "main": "serv.js",
   "scripts": {
-    "start": "node serv.js",
-    "dev": "nodemon serv.js"
+    "start": "node serv.manager.js"
   },
   "author": "mjarkk",
   "license": "ISC",
