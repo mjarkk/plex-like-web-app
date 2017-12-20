@@ -1,3 +1,4 @@
+const fs = require('fs-extra')
 const x = exports
 
 inc = (string,includes) => {
@@ -32,4 +33,8 @@ x.getpage = (url) => {
   } else if (inc(urlrl,'/settings/')) {
     return 'settings'
   }
+}
+
+x.CheckDirEx = (path) => {
+  return (fs.existsSync(path) && fs.lstatSync(path).isDirectory())
 }

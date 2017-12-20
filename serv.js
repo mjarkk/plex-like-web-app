@@ -1,7 +1,8 @@
 #!/usr/bin/node
 
-// the actual server server
+// the actual server file
 
+// required packages
 const fs = require('fs-extra')
 const aw = require('await-fs')
 const gm = require('gm').subClass({imageMagick: true})

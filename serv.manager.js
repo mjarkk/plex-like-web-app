@@ -40,9 +40,12 @@ let restart = () => setTimeout(() => {
 if (globconf.dev) {
   watch(serverconffile, { recursive: true }, (evt, name) => {
     fs.readJson(serverconffile, (err, data) => {
-      if (data.dev !== oldserverconfig.dev) {
-        restart()
-      } else if (data.port != oldserverconfig.port) {
+      if (data.dev !== oldserverconfig.dev ||
+        data.port != oldserverconfig.port ||
+        JSON.stringify(data.imagedirs) != JSON.stringify(oldserverconfig.imagedirs) ||
+        JSON.stringify(data.moviedirs) != JSON.stringify(oldserverconfig.moviedirs) ||
+        JSON.stringify(data.musicdirs) != JSON.stringify(oldserverconfig.musicdirs)
+      ) {
         restart()
       }
       oldserverconfig = data
@@ -54,7 +57,7 @@ if (globconf.dev) {
 if (globconf.dev) {
   setTimeout(() => {
     shell.exec('nodemon', {async: true}, () => {})
-  }, 1000)
+  }, 500)
 } else {
   // run the script forever
   while (true) {

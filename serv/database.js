@@ -4,6 +4,7 @@ const fs = require('fs-extra')
 const CryptoJS = require('crypto-js')
 const pbkdf2 = require('pbkdf2-sha256')
 const randomstring = require('randomstring')
+const check = require('./check.js')
 const globvars = {
   serverconf: './conf/servconfig.json'
 }
@@ -117,17 +118,67 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
               if (data.status) {
                 fs.readJson(globvars.serverconf, (err, config) => {
                   let compaire = data.data
+                  let needserverrestart = false
+                  let returnerr = []
                   if (typeof(config.port) == typeof(Number(compaire.port))) {
                     config.port = Number(compaire.port)
+                    needserverrestart = true
                   }
                   if (typeof(config.dev) == typeof(compaire.dev)) {
                     config.dev = compaire.dev
+                    needserverrestart = true
+                  }
+                  if (typeof(config.imagedirs) == typeof(compaire.imagedirs) && compaire.imagedirs[0]) {
+                    if (check.CheckDirEx(compaire.imagedirs[0])) {
+                      config.imagedirs = compaire.imagedirs
+                      needserverrestart = true
+                    } else {
+                      returnerr.push({
+                        for: 'imagedirs',
+                        what: 'direcotry does not exsist'
+                      })
+                    }
+                  } else if (typeof(config.imagedirs) == typeof(compaire.imagedirs) && !compaire.imagedirs[0]) {
+                    config.imagedirs = compaire.imagedirs
+                  }
+                  if (typeof(config.moviedirs) == typeof(compaire.moviedirs) && compaire.moviedirs[0]) {
+                    if (check.CheckDirEx(compaire.moviedirs[0])) {
+                      config.moviedirs = compaire.moviedirs
+                      needserverrestart = true
+                    } else {
+                      returnerr.push({
+                        for: 'moviedirs',
+                        what: 'direcotry does not exsist'
+                      })
+                    }
+                  } else if (typeof(config.moviedirs) == typeof(compaire.moviedirs) && !compaire.moviedirs[0]) {
+                    config.moviedirs = compaire.moviedirs
+                  }
+                  if (typeof(config.musicdirs) == typeof(compaire.musicdirs) && compaire.musicdirs[0]) {
+                    if (check.CheckDirEx(compaire.musicdirs[0])) {
+                      config.musicdirs = compaire.musicdirs
+                      needserverrestart = true
+                    } else {
+                      returnerr.push({
+                        for: 'musicdirs',
+                        what: 'direcotry does not exsist'
+                      })
+                    }
+                  } else if (typeof(config.musicdirs) == typeof(compaire.musicdirs) && !compaire.musicdirs[0]) {
+                    config.musicdirs = compaire.musicdirs
                   }
                   fs.outputJson(globvars.serverconf, config, {spaces: 2}, err => {
-
+                    if (needserverrestart && !globconf.dev) {
+                      setTimeout(() => {
+                        process.exit()
+                      }, 1000)
+                    }
+                  })
+                  res.json({
+                    status: true,
+                    errors: returnerr
                   })
                 })
-                res.json({status: true})
               } else {
                 res.json(nope)
               }
