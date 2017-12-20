@@ -27,7 +27,15 @@ button
     background-color: rgb(214, 185, 233)
 
 .button-holder
-  padding: 10px 0px
+  padding: 10px 10px
+  button
+    opacity: 1
+    transition: 0.3s
+    cursor: default
+  button:disabled
+    opacity: 0.5
+  button:hover:disabled
+    background-color: rgb(255, 255, 255)
 
 .notsupportedbrowser
   position: fixed

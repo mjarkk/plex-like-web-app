@@ -26,11 +26,17 @@ var home = new Vue({
     settings: {
       selected: 'server',
       server: {
+        updatebtndisabled: false,
         port: 0,
+        lastport: 0,
+        porterr: '',
         dev: true,
         imagedirs: '',
+        imagedirserr: '',
         moviedirs: '',
+        moviedirserr: '',
         musicdirs: '',
+        musicdirserr: '',
         users: [{
           username: 'admin'
         }]
@@ -42,7 +48,9 @@ var home = new Vue({
   },
   methods: {
     updatesettings: () => {
+      // a function for updating the user settings
       let serv = home.settings.server
+      serv.updatebtndisabled = true
       WebWorker.postMessage({
         what: 'sendmsg',
         location: '/updatesettings/basic',
@@ -56,10 +64,18 @@ var home = new Vue({
         },
         sideload: 'updatethings'
       })
+      // this for loop will remove the error's from the settings when a user tries to re updates his settings
+      let serveroptions = ['imagedirs','moviedirs','musicdirs']
+      for (var i = 0; i < serveroptions.length; i++) {
+        home.settings.server[serveroptions[i] + 'err'] = ''
+      }
     }
   },
   watch: {
     activeapp: (newval, oldval) => {
+      // load the right data for the view when it's clicked
+      // also most of the work is pushed to a webworker for a smoother experiance
+      // and the webworker has the cryptojs libary that it needs when requesting data from the server
       if (newval == 'settings') {
         fetch('/getsettings',{method: 'post',credentials: 'same-origin'})
         .then((res) => res.json())
@@ -78,6 +94,8 @@ var home = new Vue({
     }
   },
   created: () => setTimeout( () => {
+    // a timeout because sometimes the 'home' variable is not set
+    // this fixes the problem for some reason because a setTimeout runs Async
     home.username = localStorage.getItem('username')
     fetch('/basicinf',{method: 'post',credentials: 'same-origin', body: JSON.stringify({from: home.activeapp})})
     .then((res) => res.json())
@@ -88,15 +106,40 @@ var home = new Vue({
   }, 1)
 })
 
+// a webworker Event Listener this handels all the callback data from the webworker
 WebWorker.addEventListener('message', (msg) => {
   const data = msg.data
+
   if (data.what == 'getusersettings' && data.status) {
+    // all the user settings
     const inf = data.data
+    // log(inf)
     home.settings.server.port = inf.port
+    home.settings.server.lastport = inf.port
     home.settings.server.dev = inf.dev
     home.settings.server.imagedirs = inf.imagedirs[0] || ''
     home.settings.server.moviedirs = inf.moviedirs[0] || ''
     home.settings.server.musicdirs = inf.musicdirs[0] || ''
     home.settingsloaded = true
+  } else if (data.what == 'updatethings') {
+    // callback from the server for updating the settings
+    // log(data)
+
+    home.settings.server.updatebtndisabled = false
+    if (data.res.errors) {
+      // set all errors if there are anny
+      for (var i = 0; i < data.res.errors.length; i++) {
+        const err = data.res.errors[i]
+        log(err)
+        if (typeof(home.settings.server[err.for + 'err']) == 'string') {
+          home.settings.server[err.for + 'err'] = err.what
+        }
+      }
+    }
+    // give a warning if the port has changed
+    if (home.settings.server.port != home.settings.server.lastport) {
+      home.settings.server.porterr = 'The port has changed... this might result in some weird browser behaviours'
+    }
+    home.settings.server.lastport = home.settings.server.port
   }
 })

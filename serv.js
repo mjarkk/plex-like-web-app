@@ -79,6 +79,13 @@ app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, ite
 // a route to update the settings
 app.post('/updatesettings/:what', (req, res) => db.updatesettings(req,res))
 
+// testing on the client if te server response
+// this is used when the client is not shure if it has connection with the server or
+// when it needs to wait until the server restarts
+app.get('/ping',(req, res) => {
+  res.send('pong')
+})
+
 // a route to get all the needed javascript files
 app.get('*/basic.js', (req, res) => {
   if (req.path.indexOf('%2F') != -1 || req.path.indexOf('..') != -1) {

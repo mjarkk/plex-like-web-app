@@ -1,3 +1,8 @@
+// the database file this is the file that handeles all the database request
+// this file also handels encryption and decryption
+// and it handels file handeling
+
+// required packages
 const MongoClient = require('mongodb').MongoClient
 const colors = require('colors')
 const fs = require('fs-extra')
@@ -9,9 +14,11 @@ const globvars = {
   serverconf: './conf/servconfig.json'
 }
 
+// a variable for exporting
 const x = exports
 let database
 
+// connect to the database
 MongoClient.connect(globconf.dburl, (err, dbase) => {
   if (err) {
     log(err)
@@ -21,6 +28,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   database = dbase
   let db = dbase.db(globconf.dbname)
 
+  // a function for creating all tabels that you will need
   let ensuredb = (arr, pos) => {
     if (arr[pos]) {
       db.createCollection(arr[pos],(err, res) => {
@@ -36,10 +44,8 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
       log(colors.green("Connected to database!"))
     }
   }
+  // start checking/creating of the tables this function needs a array with all the tabel names
   ensuredb(['users'],0)
-
-
-
 
   // create user
   // data = {

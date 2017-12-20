@@ -78,7 +78,10 @@ self.onmessage = function (msg) {
           tochange: encrypt(msg.data.data, msg.data.key)
         }
       }, (err, jsondata) => {
-        self.postMessage(jsondata)
+        self.postMessage({
+          what: msg.data.sideload,
+          res: jsondata
+        })
       })
       break;
     default:

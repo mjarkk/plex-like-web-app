@@ -17,6 +17,9 @@
         <p>Port</p>
         <input type="number" placeholder="port" v-model="settings.server.port">
       </div>
+      <div class="row" v-if="settings.server.porterr">
+        <p class="err">{{ settings.server.porterr }}</p>
+      </div>
       <div class="row">
         <p>Dev</p>
         <div class="switch">
@@ -28,13 +31,22 @@
         <p>Images direcory</p>
         <input type="text" placeholder="direcory" v-model="settings.server.imagedirs">
       </div>
+      <div class="row" v-if='settings.server.imagedirserr'>
+        <p class="err">{{ settings.server.imagedirserr }}</p>
+      </div>
       <div class="row">
         <p>Movie direcory</p>
         <input type="text" placeholder="direcory" v-model="settings.server.moviedirs">
       </div>
+      <div class="row" v-if='settings.server.moviedirserr'>
+        <p class="err">{{ settings.server.moviedirserr }}</p>
+      </div>
       <div class="row">
         <p>Music direcory</p>
         <input type="text" placeholder="direcory" v-model="settings.server.musicdirs">
+      </div>
+      <div class="row" v-if='settings.server.musicdirserr'>
+        <p class="err">{{ settings.server.musicdirserr }}</p>
       </div>
       <div class="users">
         <h3>Users</h3>
@@ -43,7 +55,7 @@
         </div>
       </div>
       <div class="button-holder">
-        <button type="button" v-on:click="updatesettings()">Update</button>
+        <button v-bind:disabled="settings.server.updatebtndisabled" type="button" v-on:click="updatesettings()">Update</button>
       </div>
       <h2>Client</h2>
     </div>
