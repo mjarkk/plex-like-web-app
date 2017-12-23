@@ -93,7 +93,7 @@ let filesloop = (index) => {
           case 'image/png':
             dba.getfileindex({for: 'images', file: file}, (data) => {
               // check if image already exsist
-              if (data.alreadyExists && data.status) {
+              if (!data.alreadyExists && data.status) {
                 convert.basic({id: data.sha1, location: file}, (status) => {
                   next()
                 })
@@ -105,7 +105,7 @@ let filesloop = (index) => {
           case 'image/jpg':
             dba.getfileindex({for: 'images', file: file}, (data) => {
               // check if image already exsist
-              if (data.alreadyExists && data.status) {
+              if (!data.alreadyExists && data.status) {
                 convert.basic({id: data.sha1, location: file}, (status) => {
                   next()
                 })
@@ -117,7 +117,7 @@ let filesloop = (index) => {
           case 'image/gif':
             dba.getfileindex({for: 'images', file: file}, (data) => {
               // check if image already exsist
-              if (data.alreadyExists) {
+              if (!data.alreadyExists) {
                 next()
               } else {
                 next()
