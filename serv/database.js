@@ -10,9 +10,13 @@ const CryptoJS = require('crypto-js')
 const pbkdf2 = require('pbkdf2-sha256')
 const randomstring = require('randomstring')
 const check = require('./check.js')
+const sha1File = require('sha1-file')
 const globvars = {
   serverconf: './conf/servconfig.json'
 }
+
+// error handeler
+const errHandeler = require('./errorhandeler.js')
 
 // a variable for exporting
 const x = exports
@@ -33,7 +37,9 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     if (arr[pos]) {
       db.createCollection(arr[pos],(err, res) => {
         if (err) {
+          errHandeler.DatabaseErr(err)
           log(colors.red.bold('Cant create collection'))
+          log(colors.red.bold('view errors/database.log for more information'))
           db.close()
           process.exit()
         } else {
@@ -45,7 +51,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
   // start checking/creating of the tables this function needs a array with all the tabel names
-  ensuredb(['users'],0)
+  ensuredb(['users','images'],0)
 
   // create user
   // data = {
@@ -201,6 +207,49 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
       }
     } else {
       res.json(nope)
+    }
+  }
+
+  // returns a unique id for a new file
+  // data = {
+  //    for: <string (images, movies OR music)>,
+  //    file: <string (location of the file)>
+  // }
+  x.getfileindex = (data, callback) => {
+    let check = (
+      typeof(data.for) == 'string' &&
+      (data.for == 'images' || data.for == 'movies' || data.for == 'music') &&
+      typeof(data.file) == 'string')
+    if (check) {
+      let todb = {
+        filename: data.file,
+        sha1: sha1File(data.file)
+      }
+      db.collection(data.for).find({filename: {$in:[data.file]}}).toArray((err, result) => {
+        // check if the database has already an entery for the file
+        if (err || !result[0]) {
+          db.collection(data.for).insertOne(todb, (err, res) => {
+            if (err) {
+              callback(nope)
+            } else {
+              callback({
+                status: true,
+                sha1: todb.sha1,
+                alreadyExists: false
+              })
+            }
+          })
+        } else {
+          // TODO: need to overwrite the old value if the hash is divrent and delete the old image the libary
+          callback({
+            status: true,
+            sha1: todb.sha1,
+            alreadyExists: true
+          })
+        }
+      })
+    } else {
+      callback(nope)
     }
   }
 

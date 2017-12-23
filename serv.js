@@ -5,7 +5,6 @@
 // required packages
 const fs = require('fs-extra')
 const aw = require('await-fs')
-const gm = require('gm').subClass({imageMagick: true})
 const colors = require('colors')
 const express = require('express')
 const cookieParser = require('cookie-parser')
@@ -55,8 +54,10 @@ fs.ensureDirSync('./www/js')
 require('./serv/js.js')
 fs.ensureDirSync('./www/style')
 require('./serv/sass.js')
-const db = require('./serv/database.js')
+const dba = require('./serv/database.js')
 const check = require('./serv/check.js')
+const appdata = require('./serv/appdatahandeler.js')
+const img = require('./serv/img.js')
 
 // get all content from the css file
 app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, items) {
@@ -77,7 +78,7 @@ app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, ite
 }))
 
 // a route to update the settings
-app.post('/updatesettings/:what', (req, res) => db.updatesettings(req,res))
+app.post('/updatesettings/:what', (req, res) => dba.updatesettings(req,res))
 
 // testing on the client if te server response
 // this is used when the client is not shure if it has connection with the server or
@@ -157,7 +158,7 @@ app.get('*', (req, res) => {
 app.post('/getsettings', (req, res) => {
   if (req.signedCookies.logedin && req.signedCookies.username) {
     fs.readJson('./conf/servconfig.json', (err, jsondata) => {
-      db.encryptjson({
+      dba.encryptjson({
         toencrypt: jsondata,
         username: req.signedCookies.username
       }, (data) => {
@@ -173,7 +174,7 @@ app.post('/getsettings', (req, res) => {
 app.post('/getsalt', (req, res) => {
   if (req.body.username) {
     const username = req.body.username
-    db.LoginStep({
+    dba.LoginStep({
       step: 1,
       username: username
     }, (data) => {
@@ -188,7 +189,7 @@ app.post('/getsalt', (req, res) => {
 app.post('/testlogin', (req, res) => {
   const b = req.body
   if (b.username && b.teststring) {
-    db.LoginStep({
+    dba.LoginStep({
       step: 2,
       username: b.username,
       teststring: b.teststring

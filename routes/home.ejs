@@ -11,7 +11,16 @@
     <div class="header2">
       <h1>{{ activeapp.capitalize() }}</h1>
     </div>
+    <div class="app-content app-content-images" v-if="activeapp == 'images'">
+      <div class="recentimgs">
+        <h2>Recent</h2>
+      </div>
+      <div class="allimgs">
+
+      </div>
+    </div>
     <div class="app-content" v-if="activeapp == 'settings' && settingsloaded">
+      <!-- settings -->
       <h2>Server</h2>
       <div class="row">
         <p>Port</p>

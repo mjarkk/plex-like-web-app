@@ -1,1 +1,1 @@
-{"verbose":true,"ignore":["conf/*","dev/*","node_modules/*","routes/*","www/*",".git/*",".gitignore","LICENSE","README.json","yarn.lock"],"trickrestart":true}
+{"verbose":true,"ignore":["errors/*","appdata/*","conf/*","dev/*","node_modules/*","routes/*","www/*",".git/*",".gitignore","LICENSE","README.json","yarn.lock"],"trickrestart":true}
