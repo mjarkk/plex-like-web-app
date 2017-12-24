@@ -34,6 +34,9 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
 
   // a function for creating all tabels that you will need
   let ensuredb = (arr, pos) => {
+    if (pos == undefined) {
+      pos = 0
+    }
     if (arr[pos]) {
       db.createCollection(arr[pos],(err, res) => {
         if (err) {
@@ -51,7 +54,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
   // start checking/creating of the tables this function needs a array with all the tabel names
-  ensuredb(['users','images'],0)
+  ensuredb(['users','images'])
 
   // create user
   // data = {
@@ -210,6 +213,41 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
 
+  // update file information
+  // {
+  //   for: <string (images, movies OR music)>,
+  //   file: <string (location of the file)>,
+  //   toadd: {
+  //     <string (name of the converted file)>: <boolean>
+  //   }
+  // }
+  x.updatefileindex = (data, callback) => {
+    let check = (
+      typeof(data.for) == 'string' &&
+      (data.for == 'images' || data.for == 'movies' || data.for == 'music') &&
+      typeof(data.file) == 'string' &&
+      typeof(data.toadd) == 'object') &&
+      typeof(callback) == 'function'
+    if (check) {
+      if (data.for == 'images') {
+        db.collection(data.for).updateOne(
+          { filename: data.file },
+          { "$set": data.toadd },
+          {new: true, upsert: true},
+          (err, doc) => {
+            callback({status: true})
+          }
+        )
+      } else {
+        // other files types not supported yet :(
+        callback(nope)
+      }
+    } else {
+      (typeof(callback) == 'function') ? callback(nope) : log('no callback for updatefileindex')
+      return false
+    }
+  }
+
   // returns a unique id for a new file
   // data = {
   //    for: <string (images, movies OR music)>,
@@ -219,32 +257,43 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     let check = (
       typeof(data.for) == 'string' &&
       (data.for == 'images' || data.for == 'movies' || data.for == 'music') &&
-      typeof(data.file) == 'string')
+      typeof(data.file) == 'string' &&
+      callback )
     if (check) {
-      let todb = {
-        filename: data.file,
-        sha1: sha1File(data.file)
-      }
-      db.collection(data.for).find({filename: {$in:[data.file]}}).toArray((err, result) => {
-        // check if the database has already an entery for the file
-        if (err || !result[0]) {
-          db.collection(data.for).insertOne(todb, (err, res) => {
-            if (err) {
-              callback(nope)
+      fs.stat(data.file, (er, stat) => {
+        if (er) {
+          callback(nope)
+        } else {
+          let todb = {
+            filename: data.file,
+            sha1: sha1File(data.file),
+            birthtime: stat.birthtime,
+            birthtimenumber: (new Date(stat.birthtime).getTime())
+          }
+          db.collection(data.for).find({filename: {$in:[data.file]}}).toArray((err, result) => {
+            // check if the database has already an entery for the file
+            if (err || !result[0]) {
+              db.collection(data.for).insertOne(todb, (err, res) => {
+                if (err) {
+                  callback(nope)
+                } else {
+                  callback({
+                    status: true,
+                    sha1: todb.sha1,
+                    alreadyExists: false,
+                    fromdb: result[0]
+                  })
+                }
+              })
             } else {
+              // TODO: need to overwrite the old value if the hash is divrent and delete the old image the libary
               callback({
                 status: true,
                 sha1: todb.sha1,
-                alreadyExists: false
+                alreadyExists: true,
+                fromdb: result[0]
               })
             }
-          })
-        } else {
-          // TODO: need to overwrite the old value if the hash is divrent and delete the old image the libary
-          callback({
-            status: true,
-            sha1: todb.sha1,
-            alreadyExists: true
           })
         }
       })

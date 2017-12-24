@@ -10,6 +10,7 @@ const CryptoJS = require('crypto-js')
 const pbkdf2 = require('pbkdf2-sha256')
 const check = require('./check.js')
 const fileinfo = require('fileinfo')
+const path = require('path')
 
 // database file
 const dba = require('./database.js')
@@ -38,17 +39,28 @@ let convert = {
   //  id: <string (the sha of the original image this will be used to find the wright folder to place the image)>
   //}
   basic: (data, callback) => {
+    let BasicPath = `./appdata/images/public/`
+    let imagetype = (fs.existsSync(`${BasicPath}${data.id}/image.png`)) ? 'png' : 'jpg'
+    let MakeWebp = (status, quality) => webp.cwebp(`${BasicPath}${data.id}/image.${imagetype}`,`${BasicPath}${data.id}/image-${quality}.webp`,`-q ${quality}`,(output) => {
+      if (quality == 90) {
+        MakeWebp(status, 70)
+      } else if (quality == 70) {
+        MakeWebp(status, 50)
+      } else if (quality == 50) {
+        callback(status)
+      }
+    })
     if (typeof(data.location) == 'string' && typeof(data.id) == 'string') {
-      fs.ensureDir(`./appdata/images/public/${data.id}/`, () => {
+      fs.ensureDir(`${BasicPath}${data.id}/`, () => {
         Jimp.read(data.location, (err, image) => {
-          image.write(`./appdata/images/public/${data.id}/image.jpg`)
-          image.write(`./appdata/images/public/${data.id}/image.png`)
-          image.quality(80).write(`./appdata/images/public/${data.id}/image-80.jpg`)
-          image.quality(60).write(`./appdata/images/public/${data.id}/image-60.jpg`)
-          callback({status: true})
+          image.write(`${BasicPath}${data.id}/image.jpg`)
+          image.write(`${BasicPath}${data.id}/image.png`)
+          image.quality(80).write(`${BasicPath}${data.id}/image-80.jpg`)
+          image.quality(60).write(`${BasicPath}${data.id}/image-60.jpg`)
+          MakeWebp({status: true}, 90)
         }).catch((err) => {
           errHandeler.ImgErr(err)
-          callback(nope)
+          MakeWebp(nope, 90)
         })
       })
     } else {
@@ -89,50 +101,67 @@ let filesloop = (index) => {
     fileinfo(file).then((mime) => {
       if (mime.type == 'image') {
         // log(file)
-        switch (mime.mime) {
-          case 'image/png':
-            dba.getfileindex({for: 'images', file: file}, (data) => {
-              // check if image already exsist
-              if (!data.alreadyExists && data.status) {
-                convert.basic({id: data.sha1, location: file}, (status) => {
+        let filetype = mime.mime
+        if (filetype == 'image/png' || filetype == 'image/jpg' || filetype == 'image/gif') {
+          // ask the database file for the image proviel or make a new one if it doesn't exsist
+          dba.getfileindex({for: 'images', file: file}, (data) => {
+            // check if there is already a image proviel
+            if (data.status && (data.fromdb == undefined || (data.fromdb && !data.fromdb.imagejpg))) {
+              let id = data.sha1
+              convert.basic({id: id, location: file}, (status) => {
+                if (status.status) {
+                  fs.readdir(`./appdata/images/public/${id}/`, (err, ImageFiles) => {
+                    if (err) {
+                      errHandeler.ImgErr(err)
+                      next()
+                    } else {
+                      // check if all the files are made by the server
+                      let AvailableFiles = {
+                        'image-50webp': false,
+                        'image-70webp': false,
+                        'image-90webp': false,
+                        'image-60jpg': false,
+                        'image-80jpg': false,
+                        'imagejpg': false,
+                        'imagepng': false
+                      }
+                      for (var i = 0; i < ImageFiles.length; i++) {
+                        let imagefile = ImageFiles[i].replace(/\./g,'')
+                        if (typeof(AvailableFiles[imagefile]) == 'boolean') {
+                          AvailableFiles[imagefile] = true
+                        }
+                      }
+                      try {
+                        dba.updatefileindex({for: 'images', file: file, toadd: AvailableFiles}, (data) => {
+                          next()
+                        })
+                      } catch (e) {
+                        errHandeler.ImgErr(e)
+                        next()
+                      }
+                    }
+                  })
+                } else {
+                  // image failed to compile
                   next()
-                })
-              } else {
-                next()
-              }
-            })
-            break;
-          case 'image/jpg':
-            dba.getfileindex({for: 'images', file: file}, (data) => {
-              // check if image already exsist
-              if (!data.alreadyExists && data.status) {
-                convert.basic({id: data.sha1, location: file}, (status) => {
-                  next()
-                })
-              } else {
-                next()
-              }
-            })
-            break;
-          case 'image/gif':
-            dba.getfileindex({for: 'images', file: file}, (data) => {
-              // check if image already exsist
-              if (!data.alreadyExists) {
-                next()
-              } else {
-                next()
-              }
-            })
-            break;
-          default:
-            // can't handele file
-            next()
+                }
+              })
+            } else {
+              // server has already made proviel for the file
+              next()
+            }
+          })
+        } else {
+          // can't handele file
+          next()
         }
       } else {
         // file is not a image
         next()
       }
     })
+  } else {
+    log('dune checking all images')
   }
 }
 
