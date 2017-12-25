@@ -16,7 +16,11 @@
         <h2>Recent</h2>
       </div>
       <div class="allimgs">
-
+        <h2>All</h2>
+        <p v-for="image in images.images">{{ image }}</p>
+        <!-- <div class="img">
+          <div class="imgholder"></div>
+        </div> -->
       </div>
     </div>
     <div class="app-content" v-if="activeapp == 'settings' && settingsloaded">

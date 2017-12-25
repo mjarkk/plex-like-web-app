@@ -23,6 +23,8 @@ const gm = require('gm').subClass({imageMagick: true})
 const Jimp = require('jimp')
 const webp = require('webp-converter')
 
+const x = exports
+
 let dirstocheck = []
 let filestocheck = []
 
@@ -170,3 +172,34 @@ let checkdb = () => {
   (dba.getfileindex) ? dirloop(0) : setTimeout(() => checkdb(), 1000)
 }
 checkdb()
+
+// send a image to the user
+// data = {
+//   req: req,
+//   res: res,
+//   id: <string (sha1 of the image)>,
+//   quality: <number (100, 90, 80, 70, 60, 50)> (not required),
+//   resolution: <string (<height>x<width>)> (not required)
+// }
+x.sendimg = (data) => {
+  if (data.req && data.res && typeof(data.id) == 'string') {
+    let basicpath = `/appdata/images/public/${data.id}/`
+    fs.readdir('.' + basicpath, (err, ImageFiles) => {
+      let res = data.res
+      let quality = Number(data.quality)
+      if (quality && quality >= 50) {
+
+      } else if (data.resolution) {
+
+      } else {
+        if (ImageFiles.indexOf('image.png') > -1) {
+          res.sendFile(path.join(__dirname, '..', basicpath, 'image.png'))
+        } else if (ImageFiles.indexOf('image.jpg') > -1) {
+          res.sendFile(path.join(__dirname, '..', basicpath, 'image.jpg'))
+        } else {
+          res.send('nope')
+        }
+      }
+    })
+  }
+}

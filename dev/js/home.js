@@ -51,6 +51,28 @@ var home = new Vue({
     }
   },
   methods: {
+    LoadImages: () => {
+      // a method for loading images
+      // /image/ {{ id }} /false/false
+      let forimgs = (id) => {
+        if (home.images.images[id]) {
+          let image = home.images.images[id]
+          let LoadingImg = new Image()
+          LoadingImg.src = `/image/${image.id}/false/false`
+          LoadingImg.onload = () => {
+            image.show = true
+            forimgs(id + 1)
+          }
+          LoadingImg.onerror = () => {
+            // can't load the image
+            forimgs(id + 1)
+          }
+        } else {
+          // last image loaded
+        }
+      }
+      forimgs(0)
+    },
     updatesettings: () => {
       // a function for updating the user settings
       let serv = home.settings.server
@@ -164,10 +186,12 @@ WebWorker.addEventListener('message', (msg) => {
       let date = new Date(item[0])
       home.images.images.push({
         date: date,
-        id: item[1]
+        id: item[1],
+        show: false
       })
       // item[0] = this is the date of the image taken, this is mainly for the backend
       // item[1] = this is the sha1 of the image mainly used to indentify and request the image
     }
+    home.LoadImages()
   }
 })
