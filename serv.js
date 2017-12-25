@@ -77,6 +77,25 @@ app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, ite
   addfiles(0)
 }))
 
+// get a index of all images to request
+app.post('/imageindex/:index', (req, res) => {
+  let tosend = {
+    req: req,
+    res: res,
+    type: 'json',
+    index: req.params.index
+  }
+  dba.checkuser(tosend, (UserData) => dba.getimglist(tosend, (ImageDataList) => {
+    // user is logedin
+    // if the user has not the writes the database itself will do a response
+    // after that the database is asked for a list of the latest images
+    res.json({
+      status: true,
+      data: dba.encrypt(ImageDataList,UserData.key)
+    })
+  }))
+})
+
 // a route to update the settings
 app.post('/updatesettings/:what', (req, res) => dba.updatesettings(req,res))
 

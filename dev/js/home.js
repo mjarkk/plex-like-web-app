@@ -44,6 +44,10 @@ var home = new Vue({
       client: {
 
       }
+    },
+    images: {
+      loadedBasic: false,
+      images: []
     }
   },
   methods: {
@@ -78,8 +82,8 @@ var home = new Vue({
       // and the webworker has the cryptojs libary that it needs when requesting data from the server
       if (newval == 'settings') {
         fetch('/getsettings',{method: 'post',credentials: 'same-origin'})
-        .then((res) => res.json())
-        .then((jsondata) => {
+        .then(res => res.json())
+        .then(jsondata => {
           if (jsondata.status) {
             WebWorker.postMessage({
               what: 'decryptjson',
@@ -88,6 +92,19 @@ var home = new Vue({
               sideload: 'getusersettings'
             })
           }
+        })
+        .catch((e) => true)
+      } else if (newval == 'images' && !home.images.loadedBasic) {
+        fetch('/imageindex/0', {method: 'post',credentials: 'same-origin'})
+        .then(res => res.json())
+        .then(jsondata => {
+          home.images.loadedBasic = true
+          WebWorker.postMessage({
+            what: 'decryptjson',
+            key: localStorage.getItem('key'),
+            todecrypt: jsondata.data,
+            sideload: 'getbasicimages'
+          })
         })
         .catch((e) => true)
       }
@@ -141,5 +158,16 @@ WebWorker.addEventListener('message', (msg) => {
       home.settings.server.porterr = 'The port has changed... this might result in some weird browser behaviours'
     }
     home.settings.server.lastport = home.settings.server.port
+  } else if (data.what == 'getbasicimages' && data.status) {
+    for (var i = 0; i < data.data.length; i++) {
+      let item = data.data[i]
+      let date = new Date(item[0])
+      home.images.images.push({
+        date: date,
+        id: item[1]
+      })
+      // item[0] = this is the date of the image taken, this is mainly for the backend
+      // item[1] = this is the sha1 of the image mainly used to indentify and request the image
+    }
   }
 })

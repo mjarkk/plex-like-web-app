@@ -96,6 +96,59 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
 
+  // get a list of images
+  // data = {
+  //   req: req,
+  //   res: res,
+  //   index: <string OR number>
+  // }
+  x.getimglist = (data, callback) => {
+    let requestamount = 20
+    if (typeof(callback) == 'function' && data.req && data.res && (typeof(data.index) == 'number' || typeof(data.index) == 'string')) {
+      db.collection('images')
+      .find()
+      .sort({ birthtimenumber: 1 })
+      .limit(requestamount)
+      .skip(requestamount * Number(data.index))
+      .toArray((err, result) => {
+        let callbackData = []
+        for (var i = 0; i < result.length; i++) {
+          let r = result[i]
+          // compress the output data from the database to make the total browser cost smaller
+          callbackData.push([r.birthtimenumber,r.sha1])
+        }
+        callback(callbackData)
+      })
+    } else {
+      callback(nope)
+    }
+  }
+
+  // check if user is logedin
+  // data = {
+  //   req: req,
+  //   res: res,
+  //   type: <string (json OR text)>
+  // }
+  x.checkuser = (data, callback) => {
+    // TODO: cache the data from database for faster callback this would be much faster if there are a lot of users
+    if (data.req && data.res && (data.type == 'json' || data.type == 'text') && typeof(callback) == 'function' && data.req.signedCookies.logedin && data.req.signedCookies.username) {
+      db.collection("users").find({username: {$in:[data.req.signedCookies.username]}}).toArray((err, result) => {
+        if (err || !result[0]) {
+          if (data.type == 'json') {
+            data.res.json(nope)
+          } else {
+            data.res.send('nope')
+          }
+        } else {
+          callback(result[0])
+        }
+      })
+    } else if (data.res && typeof(data.res.send) == 'function') {
+      data.res.send('nope')
+    }
+  }
+
   // encrypt some json data
   // data = {
   //   toencrypt: {/* json opbject */} OR [/* array */]
@@ -110,7 +163,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
         } else {
           callback({
             status: true,
-            data: encrypt(data.toencrypt, result[0].key)
+            data: x.encrypt(data.toencrypt, result[0].key)
           })
         }
       })
@@ -331,7 +384,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
               callback({
                 status: true,
                 salt: result[0].salt,
-                key: encrypt(result[0].key, result[0].password)
+                key: x.encrypt(result[0].key, result[0].password)
               })
             }
           })
@@ -351,7 +404,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
                 why: 'User_not_found'
               })
             } else {
-              decrypt(data.teststring, result[0].password + result[0].salt, (res) => {
+              x.decrypt(data.teststring, result[0].password + result[0].salt, (res) => {
                 if (res) {
                   callback({
                     status: true
@@ -392,7 +445,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
         if (err || !result[0]) {
           callback(nope)
         } else {
-          decrypt(data.decrypt, result[0].key, (data) => {
+          x.decrypt(data.decrypt, result[0].key, (data) => {
             if (!data) {
               callback(nope)
             } else {
@@ -417,7 +470,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   }
 
   // encrypt function
-  let encrypt = (ToEncrypt,key) => {
+  x.encrypt = (ToEncrypt,key) => {
     if (typeof(ToEncrypt) == 'object') {
       return(CryptoJS.AES.encrypt(JSON.stringify(ToEncrypt), key).toString())
     } else {
@@ -426,7 +479,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   }
 
   // decrypt function
-  let decrypt = (data, key, callback) => {
+  x.decrypt = (data, key, callback) => {
     try {
       let decrypted = CryptoJS.AES.decrypt(data,key).toString(CryptoJS.enc.Utf8)
       callback(decrypted)
