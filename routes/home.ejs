@@ -17,10 +17,31 @@
       </div>
       <div class="allimgs">
         <h2>All</h2>
-        <p v-for="image in images.images">{{ image }}</p>
-        <!-- <div class="img">
-          <div class="imgholder"></div>
-        </div> -->
+        <div class="imgholderbig">
+          <!-- <p v-for="image in images.images">{{ image }}</p> -->
+          <div class="year" v-for="(year, yearname) in images.imagesindexes">
+            <div class="month" v-for="(month, monthname) in year">
+              <div class="day" v-for="(day, dayname) in month">
+                <p class="dayname-title">{{ ReturnDay(yearname.replace(/-/g,''), monthname.replace(/-/g,''), dayname.replace(/-/g,'')) }} {{ dayname.replace(/-/g,'') }} {{ monthname.replace(/-/g,'') }}</p>
+                <div class="roww" v-for="row in day.rows">
+                  <div
+                  class="img"
+                  v-for="img in row"
+                  v-bind:style="{
+                    'width': ((Math.round(images.baseimgheight * img.aspect) > 700) ? 700 : Math.round(images.baseimgheight * img.aspect)) + 'px'
+                  }">
+                    <div
+                    class="imgholder"
+                    v-if="images.images[img.id].show"
+                    :style="{'background-image': `url(${images.images[img.id].url})`}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
     <div class="app-content" v-if="activeapp == 'settings' && settingsloaded">

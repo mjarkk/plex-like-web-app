@@ -46,11 +46,76 @@ var home = new Vue({
       }
     },
     images: {
+      baseimgheight: 200,
       loadedBasic: false,
-      images: []
+      images: [],
+      imagesindexes: {}
     }
   },
   methods: {
+    ReturnDay: (year, month, day) => {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      const date = new Date(`${year}-${month}-${day}`)
+      return days[date.getDay()]
+    },
+    ImgPreMake: () => {
+      // this function makes a list of images
+      let imgs = home.images.images
+      let time = {}
+      for (var i = 0; i < imgs.length; i++) {
+        let img = imgs[i]
+        let date = new Date(imgs[i].date)
+        let year = '-' + date.getFullYear() + '-'
+        let month = '-' + (date.getMonth() + 1) + '-'
+        let day = '-' + date.getDate() + '-'
+        if (!time[year]) {
+          time[year] = {}
+        }
+        if (!time[year][month]) {
+          time[year][month] = {}
+        }
+        if (!time[year][month][day]) {
+          time[year][month][day] = {
+            rows: [],
+            available: []
+          }
+        }
+        time[year][month][day].available.push({
+          id: i,
+          aspect: img.aspect
+        })
+      }
+      let ContentWidth = document.querySelector('.content').clientWidth - 200
+      for (const year in time) {
+        if (time[year]) {
+          for (const month in time[year]) {
+            if (time[year][month]) {
+              for (const day in time[year][month]) {
+                if (time[year][month][day]) {
+                  let testsize = 0
+                  let dayimgs = time[year][month][day].available
+                  time[year][month][day].rows.push([])
+                  for (img of dayimgs) {
+                    let imgsize = Math.round(img.aspect * home.images.baseimgheight)
+                    imgsize = (imgsize > 700) ? 700 : imgsize
+                    let newsize = testsize + imgsize
+                    if (newsize >= ContentWidth) {
+                      testsize = 0
+                      time[year][month][day].rows.push([])
+                    } else {
+                      testsize = newsize
+                    }
+                    time[year][month][day].rows[time[year][month][day].rows.length - 1].push(img)
+                  }
+                  time[year][month][day].available = []
+                }
+              }
+            }
+          }
+        }
+      }
+      home.images.imagesindexes = time
+    },
     LoadImages: () => {
       // a method for loading images
       // /image/ {{ id }} /false/false
@@ -59,6 +124,7 @@ var home = new Vue({
           let image = home.images.images[id]
           let LoadingImg = new Image()
           LoadingImg.src = `/image/${image.id}/false/false`
+          image.url = LoadingImg.src
           LoadingImg.onload = () => {
             image.show = true
             forimgs(id + 1)
@@ -184,14 +250,25 @@ WebWorker.addEventListener('message', (msg) => {
     for (var i = 0; i < data.data.length; i++) {
       let item = data.data[i]
       let date = new Date(item[0])
-      home.images.images.push({
+      let save = {
         date: date,
         id: item[1],
-        show: false
-      })
+        show: false,
+        url: '',
+        width: item[2],
+        height: item[3],
+        aspect: 1.5
+      }
+      if (item[2] && item[3]) {
+        save.aspect = Math.round(100 * (item[2] / item[3])) / 100
+      }
+      home.images.images.push(save)
       // item[0] = this is the date of the image taken, this is mainly for the backend
       // item[1] = this is the sha1 of the image mainly used to indentify and request the image
+      // item[2] = the width of the image
+      // item[3] = the height of the image
     }
+    home.ImgPreMake()
     home.LoadImages()
   }
 })

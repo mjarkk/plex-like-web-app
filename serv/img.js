@@ -22,6 +22,7 @@ const errHandeler = require('./errorhandeler.js')
 const gm = require('gm').subClass({imageMagick: true})
 const Jimp = require('jimp')
 const webp = require('webp-converter')
+const sizeOf = require('image-size')
 
 const x = exports
 
@@ -100,13 +101,13 @@ let filesloop = (index) => {
   }
   if (file) {
     // get file info to determen how we need to handel the file
-    fileinfo(file).then((mime) => {
+    fileinfo(file).then((mime) => sizeOf(file, (err, dimensions) => {
       if (mime.type == 'image') {
         // log(file)
         let filetype = mime.mime
         if (filetype == 'image/png' || filetype == 'image/jpg' || filetype == 'image/gif') {
           // ask the database file for the image proviel or make a new one if it doesn't exsist
-          dba.getfileindex({for: 'images', file: file}, (data) => {
+          dba.getfileindex({for: 'images', file: file, dimensions: dimensions}, (data) => {
             // check if there is already a image proviel
             if (data.status && (data.fromdb == undefined || (data.fromdb && !data.fromdb.imagejpg))) {
               let id = data.sha1
@@ -161,7 +162,7 @@ let filesloop = (index) => {
         // file is not a image
         next()
       }
-    })
+    }))
   } else {
     log('dune checking all images')
   }

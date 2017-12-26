@@ -30,6 +30,8 @@
     .selected svg
       fill: rgb(113, 24, 157)
   .content
+    overflow-y: scroll
+    overflow-x: hidden
     width: 100%
     .header
       height: 50px
@@ -86,5 +88,24 @@
       .recentimgs, .allimgs
         h2
           padding: 10px 10px 0px 10px
+        .imgholderbig
+          .day
+          .dayname-title
+            padding-left: 10px
+            font-size: 25px
+            font-weight: 700
+          .roww
+            display: flex
+          .img
+            height: 270px
+            max-width: 100%
+            box-sizing: border-box
+            padding: 10px
+            .imgholder
+              height: 100%
+              width: 100%
+              background-size: contain
+              background-position: center
+              background-repeat: no-repeat
     .app-content-images
       padding: 0px

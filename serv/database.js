@@ -107,7 +107,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     if (typeof(callback) == 'function' && data.req && data.res && (typeof(data.index) == 'number' || typeof(data.index) == 'string')) {
       db.collection('images')
       .find()
-      .sort({ birthtimenumber: 1 })
+      .sort({ birthtimenumber: -1 })
       .limit(requestamount)
       .skip(requestamount * Number(data.index))
       .toArray((err, result) => {
@@ -115,7 +115,11 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
         for (var i = 0; i < result.length; i++) {
           let r = result[i]
           // compress the output data from the database to make the total browser cost smaller
-          callbackData.push([r.birthtimenumber,r.sha1])
+          let ToSend = [r.birthtimenumber,r.sha1]
+          if (r.dimensions && r.dimensions.width && r.dimensions.height) {
+            ToSend.push(r.dimensions.width, r.dimensions.height)
+          }
+          callbackData.push(ToSend)
         }
         callback(callbackData)
       })
@@ -304,13 +308,15 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   // returns a unique id for a new file
   // data = {
   //    for: <string (images, movies OR music)>,
-  //    file: <string (location of the file)>
+  //    file: <string (location of the file)>,
+  //    dimensions: <object (only when using images)>
   // }
   x.getfileindex = (data, callback) => {
     let check = (
       typeof(data.for) == 'string' &&
       (data.for == 'images' || data.for == 'movies' || data.for == 'music') &&
       typeof(data.file) == 'string' &&
+      typeof(data.dimensions) == 'object' &&
       callback )
     if (check) {
       fs.stat(data.file, (er, stat) => {
@@ -322,6 +328,9 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
             sha1: sha1File(data.file),
             birthtime: stat.birthtime,
             birthtimenumber: (new Date(stat.birthtime).getTime())
+          }
+          if (data.for == 'images' && data.dimensions) {
+            todb['dimensions'] = data.dimensions
           }
           db.collection(data.for).find({filename: {$in:[data.file]}}).toArray((err, result) => {
             // check if the database has already an entery for the file
