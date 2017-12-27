@@ -28,3 +28,14 @@ and it's of course mobile friendly
 
 ### configure
 open in a text editor **conf/servconfig.json**
+
+## Bugs
+- On windows the server will not stop running if you press ctrl + c, Solution: on windows open task manager and kill all nodejs services
+- If you change dev mode in the settings the server will not stop the live reload or will not start live the live reload, Solution: manually restart the server.
+
+## Working on:
+- :heavy_check_mark: Settings
+- :heavy_check_mark: Images
+- :x: Movies
+- :x: Home
+- :x: Music
