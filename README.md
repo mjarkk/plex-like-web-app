@@ -14,13 +14,17 @@ and it's of course mobile friendly
 - And ofcourse all basic things that a server/client needs: (login, settings, etc)
 
 ## How to use
-### to Install
+### Install
 - open a terminal and type:
 - git clone https://github.com/mjarkk/plex-like-web-app
 - yarn install
 
-### to Start
+### Start
 - yarn start
+
+### Update
+- in a terminal type: yarn
+- if that doesn't work remove the node_modules folder and try start again
 
 ### configure
 open in a text editor **conf/servconfig.json**
