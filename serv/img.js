@@ -23,6 +23,7 @@ const gm = require('gm').subClass({imageMagick: true})
 const Jimp = require('jimp')
 const webp = require('webp-converter')
 const sizeOf = require('image-size')
+const sharp = require('sharp')
 
 const x = exports
 
@@ -180,27 +181,82 @@ checkdb()
 //   res: res,
 //   id: <string (sha1 of the image)>,
 //   quality: <number (100, 90, 80, 70, 60, 50)> (not required),
-//   resolution: <string (<height>x<width>)> (not required)
+//   resolution: <string (<width>x<height>)> (not required),
+//   webp: <boolean>
 // }
 x.sendimg = (data) => {
-  if (data.req && data.res && typeof(data.id) == 'string') {
+  if (data.req && data.res && typeof(data.id) == 'string' && typeof(data.webp) == 'boolean') {
     let basicpath = `/appdata/images/public/${data.id}/`
     fs.readdir('.' + basicpath, (err, ImageFiles) => {
+
       let res = data.res
-      let quality = Number(data.quality)
-      if (quality && quality >= 50) {
+      let useimg = (ImageFiles.indexOf('image.png') > -1) ?
+        path.join(__dirname, '..', basicpath, 'image.png') :
+          (path.join(__dirname, '..', basicpath, 'image.jpg') > -1) ?
+            path.join(__dirname, '..', basicpath, 'image.jpg') :
+              undefined
 
-      } else if (data.resolution) {
-
-      } else {
-        if (ImageFiles.indexOf('image.png') > -1) {
-          res.sendFile(path.join(__dirname, '..', basicpath, 'image.png'))
-        } else if (ImageFiles.indexOf('image.jpg') > -1) {
-          res.sendFile(path.join(__dirname, '..', basicpath, 'image.jpg'))
+      let SetQuality = () => {
+        let quality = Number(data.quality)
+        if (quality && quality >= 50 && quality <= 100) {
+          if (quality == 100) {
+            CutImg()
+          } else {
+            let option
+            let type
+            let check
+            if (data.webp) {
+              type = 'webp'
+              check = [90,70,50]
+            } else {
+              type = 'jpg'
+              check = [80,60]
+            }
+            for (var i = 0; i < check.length; i++) {
+              if (ImageFiles.indexOf(`image-${check[i]}.${type}`) > -1 && (quality == check[i] || !option)) {
+                option = check[i]
+              }
+            }
+            if (option && type) {
+              useimg = path.join(__dirname, '..', basicpath, `image-${option}.${type}`)
+            }
+            CutImg()
+          }
         } else {
-          res.send('nope')
+          CutImg()
         }
       }
+
+      let CutImg = () => {
+        if (data.resolution) {
+          let x = data.resolution.indexOf('x')
+          let height = Number(data.resolution.substr(0,x))
+          let width = Number(data.resolution.substr(x + 1, data.resolution.lenght))
+
+          sharp(useimg)
+          .resize(height, width)
+          .toBuffer()
+          .then( data => SendImg(data) )
+          .catch( err => SendImg())
+
+        } else {
+          SendImg()
+        }
+      }
+      let SendImg = (inputbuffer) => {
+        if (inputbuffer) {
+          res.set('Content-Type', path.extname(useimg).replace('.',''))
+          res.send(inputbuffer)
+        } else {
+          if (useimg) {
+            res.sendFile(useimg)
+          } else {
+            res.send('nope')
+          }
+        }
+      }
+      SetQuality()
+
     })
   }
 }

@@ -105,6 +105,8 @@ var home = new Vue({
                     } else {
                       testsize = newsize
                     }
+                    home.images.images[img.id].RenderWidth = imgsize
+                    home.images.images[img.id].RenderHeight = home.images.baseimgheight
                     time[year][month][day].rows[time[year][month][day].rows.length - 1].push(img)
                   }
                   time[year][month][day].available = []
@@ -122,8 +124,8 @@ var home = new Vue({
       let forimgs = (id) => {
         if (home.images.images[id]) {
           let image = home.images.images[id]
-          let LoadingImg = new Image()
-          LoadingImg.src = `/image/${image.id}/false/false`
+          let LoadingImg = new Image(image.RenderWidth, image.RenderHeight)
+          LoadingImg.src = `/image/${image.id}/60/${image.RenderWidth}x${image.RenderHeight}/false`
           image.url = LoadingImg.src
           LoadingImg.onload = () => {
             image.show = true
@@ -257,7 +259,9 @@ WebWorker.addEventListener('message', (msg) => {
         url: '',
         width: item[2],
         height: item[3],
-        aspect: 1.5
+        aspect: 1.5,
+        RenderWidth: item[2], // this will be later set to a relative size
+        RenderHeight: item[3]
       }
       if (item[2] && item[3]) {
         save.aspect = Math.round(100 * (item[2] / item[3])) / 100

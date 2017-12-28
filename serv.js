@@ -98,16 +98,18 @@ app.post('/imageindex/:index', (req, res) => {
 
 // return a image
 let imagereturn = (tosend) => dba.checkuser(tosend, (UserData) => img.sendimg(tosend))
-app.get('/image/:id/:quality/:resolution', (req, res) => {
+app.get('/image/:id/:quality/:resolution/:webpSuported', (req, res) => {
   let resolution = req.params.resolution
   let quality = req.params.quality
+  let webp = req.params.webpSuported
   imagereturn({
     req: req,
     res: res,
     type: 'text',
     id: req.params.id,
     resolution: (resolution == '---' || resolution == 'false') ? undefined : resolution,
-    quality: (quality == '---' || quality == 'false') ? undefined : quality
+    quality: (quality == '---' || quality == 'false') ? undefined : quality,
+    webp: (webp == 'true') ? true : false
   })
 })
 
