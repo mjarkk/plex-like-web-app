@@ -190,6 +190,8 @@ x.sendimg = (data) => {
     fs.readdir('.' + basicpath, (err, ImageFiles) => {
 
       let res = data.res
+
+      // check with image i need to use
       let useimg = (ImageFiles.indexOf('image.png') > -1) ?
         path.join(__dirname, '..', basicpath, 'image.png') :
           (path.join(__dirname, '..', basicpath, 'image.jpg') > -1) ?
@@ -197,6 +199,7 @@ x.sendimg = (data) => {
               undefined
 
       let SetQuality = () => {
+        // check if the url includes a quality rule
         let quality = Number(data.quality)
         if (quality && quality >= 50 && quality <= 100) {
           if (quality == 100) {
@@ -228,6 +231,7 @@ x.sendimg = (data) => {
       }
 
       let CutImg = () => {
+        // make the resulution of the image smaller if the client has asked for it
         if (data.resolution) {
           let x = data.resolution.indexOf('x')
           let height = Number(data.resolution.substr(0,x))
@@ -243,10 +247,11 @@ x.sendimg = (data) => {
           SendImg()
         }
       }
-      let SendImg = (inputbuffer) => {
-        if (inputbuffer) {
+      let SendImg = (buffer) => {
+        // send the image
+        if (buffer) {
           res.set('Content-Type', path.extname(useimg).replace('.',''))
-          res.send(inputbuffer)
+          res.send(buffer)
         } else {
           if (useimg) {
             res.sendFile(useimg)
