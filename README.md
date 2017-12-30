@@ -35,7 +35,9 @@ open in a text editor **conf/servconfig.json**
 
 ## Working on:
 - :heavy_check_mark: Settings
-- :heavy_check_mark: Images
-- :x: Movies
+- :heavy_check_mark: Images list
+- :x: Image Viewer
+- :x: Movies list
+- :x: Movies viewer
 - :x: Home
 - :x: Music

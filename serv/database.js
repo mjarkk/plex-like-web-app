@@ -60,7 +60,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   // data = {
   //   username: 'username',
   //   password: 'password',
-  //   check: true // <-- check if the password is strong and valid
+  //   check: true // <-- check if the password is strong and valid (for devolopment it's handy to have no checking)
   // }
   x.createuser = (data, callback) => {
     if (data && typeof(data.username) == 'string' && typeof(data.password) == 'string' && typeof(data.check) == 'boolean') {

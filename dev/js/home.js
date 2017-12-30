@@ -46,6 +46,8 @@ var home = new Vue({
       }
     },
     images: {
+      rechedend: false,
+      imagesindex: 0,
       baseimgheight: 200,
       loadedBasic: false,
       images: [],
@@ -54,15 +56,37 @@ var home = new Vue({
   },
   methods: {
     ReturnDay: (year, month, day) => {
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-      const date = new Date(`${year}-${month}-${day}`)
-      return days[date.getDay()]
+      const date = new Date(`${year.replace(/-/g,'')}-${month.replace(/-/g,'')}-${day.replace(/-/g,'')}`)
+      return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()].substring(0,3)}`
     },
-    ImgPreMake: () => {
-      // this function makes a list of images
+    fetchnewimgs: (callback) => {
+      if (!home.images.rechedend) {
+        home.images.imagesindex = home.images.imagesindex + 1
+        fetch('/imageindex/' + (home.images.imagesindex - 1), {method: 'post',credentials: 'same-origin'})
+        .then(res => res.json())
+        .then(jsondata => {
+          home.images.loadedBasic = true
+          WebWorker.postMessage({
+            what: 'decryptjson',
+            key: localStorage.getItem('key'),
+            todecrypt: jsondata.data,
+            sideload: 'getbasicimages'
+          })
+          if (callback) callback(true)
+        })
+        .catch((e) => true)
+      } else {
+        if (callback) callback(false)
+      }
+    },
+    ImgPreMake: (from) => {
+      // creates a object with all images you will need
       let imgs = home.images.images
       let time = {}
-      for (var i = 0; i < imgs.length; i++) {
+      for (var from = 0; from < imgs.length; from++) {
+        let i = from
         let img = imgs[i]
         let date = new Date(imgs[i].date)
         let year = '-' + date.getFullYear() + '-'
@@ -118,7 +142,7 @@ var home = new Vue({
       }
       home.images.imagesindexes = time
     },
-    LoadImages: () => {
+    LoadImages: (from) => {
       // a method for loading images
       // /image/ {{ id }} /false/false
       let forimgs = (id) => {
@@ -139,7 +163,7 @@ var home = new Vue({
           // last image loaded
         }
       }
-      forimgs(0)
+      forimgs(from)
     },
     updatesettings: () => {
       // a function for updating the user settings
@@ -185,18 +209,7 @@ var home = new Vue({
         })
         .catch((e) => true)
       } else if (newval == 'images' && !home.images.loadedBasic) {
-        fetch('/imageindex/0', {method: 'post',credentials: 'same-origin'})
-        .then(res => res.json())
-        .then(jsondata => {
-          home.images.loadedBasic = true
-          WebWorker.postMessage({
-            what: 'decryptjson',
-            key: localStorage.getItem('key'),
-            todecrypt: jsondata.data,
-            sideload: 'getbasicimages'
-          })
-        })
-        .catch((e) => true)
+        home.fetchnewimgs()
       }
     }
   },
@@ -210,6 +223,16 @@ var home = new Vue({
       log(jsondata)
     })
     .catch((e) => true)
+    let scrollel = document.querySelector('.home-vue .content')
+    let currentlysearching = false
+    scrollel.onscroll = () => {
+      if(home.activeapp == 'images' && !currentlysearching && scrollel.scrollTop + scrollel.offsetHeight > (scrollel.scrollHeight - scrollel.offsetHeight) / 1.5) {
+        currentlysearching = true
+        home.fetchnewimgs(() => setTimeout(() => {
+          currentlysearching = false
+        }, 100))
+      }
+    }
   }, 1)
 })
 
@@ -249,6 +272,10 @@ WebWorker.addEventListener('message', (msg) => {
     }
     home.settings.server.lastport = home.settings.server.port
   } else if (data.what == 'getbasicimages' && data.status) {
+    if (data.data.length == 0) {
+      home.images.rechedend = true
+    }
+    let imagesLenght = home.images.images.length
     for (var i = 0; i < data.data.length; i++) {
       let item = data.data[i]
       let date = new Date(item[0])
@@ -272,7 +299,7 @@ WebWorker.addEventListener('message', (msg) => {
       // item[2] = the width of the image
       // item[3] = the height of the image
     }
-    home.ImgPreMake()
-    home.LoadImages()
+    home.ImgPreMake(imagesLenght)
+    home.LoadImages(imagesLenght)
   }
 })

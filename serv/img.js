@@ -254,16 +254,15 @@ x.sendimg = (data) => {
       let SendImg = (buffer) => {
         // send the image
         if (buffer) {
+          // send a image buffer to the user from the eddited image
           res.set('Content-Type', path.extname(useimg).replace('.',''))
           res.send(buffer)
-          fs.writeFile(ReqPathSha1, buffer, (err) => {
-            if (err) {
-              errHandeler.ImgErr(err)
-            }
-          })
+          fs.writeFile(ReqPathSha1, buffer, (err) => (err) ? errHandeler.ImgErr(err) : true)
         } else {
           if (useimg) {
+            // send the right file to the user
             res.sendFile(useimg)
+            fs.copy(useimg, ReqPathSha1, err => (err) ? errHandeler.ImgErr(err) : true)
           } else {
             res.send('nope')
           }
@@ -272,12 +271,13 @@ x.sendimg = (data) => {
 
       let ReqPathSha1 = `./cache/images/${CryptoJS.enc.Hex.stringify(CryptoJS.SHA1(`${data.id}${data.resolution}${data.quality}${data.webp}`))}`
       if (fs.existsSync(ReqPathSha1)) {
+        // sendcached image to the user
         let sendurl = path.join(__dirname, '..', ReqPathSha1)
         res.sendFile(sendurl)
       } else {
+        // image is never cached
         SetQuality()
       }
-
     })
   }
 }
