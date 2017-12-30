@@ -65,3 +65,4 @@ www/style/*
 www/js/*
 dev/style/*.css
 appdata/*
+cache/*

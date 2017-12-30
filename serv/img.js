@@ -230,15 +230,19 @@ x.sendimg = (data) => {
         }
       }
 
-      let CutImg = () => {
-        // make the resulution of the image smaller if the client has asked for it
+      let CutImg = () => sizeOf(useimg, (err, dim) => {
+        // set the resulution of the image smaller if the client has asked for it
+        // if the aksed resolution is larger than the image it will send the size of the image
         if (data.resolution) {
           let x = data.resolution.indexOf('x')
-          let height = Number(data.resolution.substr(0,x))
-          let width = Number(data.resolution.substr(x + 1, data.resolution.lenght))
+          let width = Number(data.resolution.substr(0,x))
+          width = (width > dim.width) ? dim.width : width
+
+          let height = Number(data.resolution.substr(x + 1, data.resolution.lenght))
+          height = (height > dim.height) ? dim.height : height
 
           sharp(useimg)
-          .resize(height, width)
+          .resize(width, height)
           .toBuffer()
           .then( data => SendImg(data) )
           .catch( err => SendImg())
@@ -246,12 +250,17 @@ x.sendimg = (data) => {
         } else {
           SendImg()
         }
-      }
+      })
       let SendImg = (buffer) => {
         // send the image
         if (buffer) {
           res.set('Content-Type', path.extname(useimg).replace('.',''))
           res.send(buffer)
+          fs.writeFile(ReqPathSha1, buffer, (err) => {
+            if (err) {
+              errHandeler.ImgErr(err)
+            }
+          })
         } else {
           if (useimg) {
             res.sendFile(useimg)
@@ -260,7 +269,14 @@ x.sendimg = (data) => {
           }
         }
       }
-      SetQuality()
+
+      let ReqPathSha1 = `./cache/images/${CryptoJS.enc.Hex.stringify(CryptoJS.SHA1(`${data.id}${data.resolution}${data.quality}${data.webp}`))}`
+      if (fs.existsSync(ReqPathSha1)) {
+        let sendurl = path.join(__dirname, '..', ReqPathSha1)
+        res.sendFile(sendurl)
+      } else {
+        SetQuality()
+      }
 
     })
   }
