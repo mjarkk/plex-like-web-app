@@ -41,3 +41,4 @@ open in a text editor **conf/servconfig.json**
 - :x: Movies viewer
 - :x: Home
 - :x: Music
+- :x: URL handler
