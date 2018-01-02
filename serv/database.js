@@ -101,10 +101,11 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   //   req: req,
   //   res: res,
   //   index: <string OR number>
+  //   amound: <number>
   // }
   x.getimglist = (data, callback) => {
-    let requestamount = 20
-    if (typeof(callback) == 'function' && data.req && data.res && (typeof(data.index) == 'number' || typeof(data.index) == 'string')) {
+    if (typeof(callback) == 'function' && data.amound && data.req && data.res && (typeof(data.index) == 'number' || typeof(data.index) == 'string')) {
+      let requestamount = data.amound
       db.collection('images')
       .find()
       .sort({ birthtimenumber: -1 })

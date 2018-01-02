@@ -16,7 +16,6 @@ reqfile = (required, callback) => {
       let s = document.createElement('script')
       s.src = `/js/${ encodeURIComponent(required.replace('/','').replace('http','').replace('..','').replace('%2F','')) }.js`
       document.body.append(s)
-      log('idk')
       s.onload = () => {
         callback()
       }

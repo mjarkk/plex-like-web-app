@@ -253,9 +253,9 @@ x.sendimg = (data) => {
       })
       let SendImg = (buffer) => {
         // send the image
+        res.set('Content-Type', 'image/' + path.extname(useimg).replace('.',''))
         if (buffer) {
           // send a image buffer to the user from the eddited image
-          res.set('Content-Type', path.extname(useimg).replace('.',''))
           res.send(buffer)
           fs.writeFile(ReqPathSha1, buffer, (err) => (err) ? errHandeler.ImgErr(err) : true)
         } else {

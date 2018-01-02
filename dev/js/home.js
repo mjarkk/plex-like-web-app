@@ -55,6 +55,14 @@ var home = new Vue({
     }
   },
   methods: {
+    openimg: (image) => reqfile('imgviewer', () => {
+      document.querySelector('.img-viewer-vue').style.display = 'block'
+      imgviewer.showimg({
+        aspect: image.aspect,
+        id: image.id,
+        previewurl: image.url
+      })
+    }),
     ReturnDay: (year, month, day) => {
       const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -64,7 +72,12 @@ var home = new Vue({
     fetchnewimgs: (callback) => {
       if (!home.images.rechedend) {
         home.images.imagesindex = home.images.imagesindex + 1
-        fetch('/imageindex/' + (home.images.imagesindex - 1), {method: 'post',credentials: 'same-origin'})
+
+        // calculate the amound of images to load this depends on the screen resolution of the user
+        let scrollel = document.querySelector('.home-vue .content')
+        let loadamound = Math.round((scrollel.offsetWidth / home.images.baseimgheight * 1.1) * (scrollel.offsetHeight / home.images.baseimgheight * 1.45))
+
+        fetch(`/imageindex/${home.images.imagesindex - 1}/${loadamound}`, {method: 'post',credentials: 'same-origin'})
         .then(res => res.json())
         .then(jsondata => {
           home.images.loadedBasic = true
@@ -225,12 +238,20 @@ var home = new Vue({
     .catch((e) => true)
     let scrollel = document.querySelector('.home-vue .content')
     let currentlysearching = false
+    let lastwith = undefined
     scrollel.onscroll = () => {
-      if(home.activeapp == 'images' && !currentlysearching && scrollel.scrollTop + scrollel.offsetHeight > (scrollel.scrollHeight - scrollel.offsetHeight) / 1.5) {
+      if(!currentlysearching && home.activeapp == 'images' && scrollel.scrollTop + scrollel.offsetHeight > (scrollel.scrollHeight - scrollel.offsetHeight) / 1.5) {
         currentlysearching = true
         home.fetchnewimgs(() => setTimeout(() => {
           currentlysearching = false
         }, 100))
+      }
+      if (!lastwith) {
+        lastwith = scrollel.offsetWidth
+      } else if (home.activeapp == 'images' && lastwith != scrollel.offsetWidth) {
+        // re-render the image layout if the width of the page changes
+        home.ImgPreMake(0)
+        lastwith = scrollel.offsetWidth
       }
     }
   }, 1)

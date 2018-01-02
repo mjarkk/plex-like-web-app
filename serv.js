@@ -78,12 +78,13 @@ app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, ite
 }))
 
 // get a index of all images to request
-app.post('/imageindex/:index', (req, res) => {
+app.post('/imageindex/:index/:amound', (req, res) => {
   let tosend = {
     req: req,
     res: res,
     type: 'json',
-    index: req.params.index
+    index: req.params.index,
+    amound: Number(req.params.amound)
   }
   dba.checkuser(tosend, (UserData) => dba.getimglist(tosend, (ImageDataList) => {
     // user is logedin

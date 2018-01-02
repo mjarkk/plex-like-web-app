@@ -99,6 +99,7 @@
           .roww
             display: flex
           .img
+            cursor: pointer
             height: 270px
             max-width: 100%
             box-sizing: border-box
@@ -111,3 +112,50 @@
               background-repeat: no-repeat
     .app-content-images
       padding: 0px
+
+.img-viewer-vue
+  z-index: 3
+  position: fixed
+  top: 0px
+  left: 0px
+  height: 100vh
+  width: 100vw
+  background-color: black
+  .mainviewer
+    height: 100%
+    width: 100%
+    box-sizing: border-box
+    .layer
+      position: relative
+      height: 100%
+      width: 100%
+      box-sizing: border-box
+      .img
+        display: none
+        height: 100%
+        width: 100%
+        background-size: contain
+        background-position: center
+        background-repeat: no-repeat
+      .show
+        display: block
+    .layer2
+      top: -100%
+    .layer3
+      top: -200%
+  .options
+    .backbtn
+      position: fixed
+      top: 10px
+      left: 10px
+      cursor: pointer
+      background-color: rgba(0, 0, 0, 0.4)
+      height: 30px
+      width: 30px
+      border-radius: 100%
+      display: flex
+      justify-content: center
+      align-items: center
+      svg
+        height: 30px
+        width: 30px

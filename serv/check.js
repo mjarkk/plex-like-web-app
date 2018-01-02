@@ -1,6 +1,7 @@
 const fs = require('fs-extra')
 const x = exports
 
+// a wrapper for string.prototype.includes
 inc = (string,includes) => {
   return string.includes(includes)
 }
