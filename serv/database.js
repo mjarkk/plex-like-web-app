@@ -54,7 +54,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
   // start checking/creating of the tables this function needs a array with all the tabel names
-  ensuredb(['users','images'])
+  ensuredb(['users','images','checkencryption'])
 
   // create user
   // data = {
@@ -178,8 +178,8 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   }
 
   // update settings route redirected from /updatesettings/{{ whatever }}
-  x.updatesettings = (req, res) => {
-    if (req.signedCookies.logedin && req.signedCookies.username && req.body.tochange) {
+  x.updatesettings = (req, res) => checkencryption(req.body.tochange).then((encryptstatus) => {
+    if (req.signedCookies.logedin && req.signedCookies.username && req.body.tochange && encryptstatus) {
       switch(req.params.what) {
         case 'basic':
           // change the core server config
@@ -197,6 +197,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
                     config.port = Number(compaire.port)
                     needserverrestart = true
                   }
+
                   if (typeof(config.dev) == typeof(compaire.dev)) {
                     config.dev = compaire.dev
                     needserverrestart = true
@@ -269,7 +270,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     } else {
       res.json(nope)
     }
-  }
+  })
 
   // update file information
   // {
@@ -437,6 +438,39 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
         status: false,
         why: 'Step_not_defined'
       })
+    }
+  }
+
+  // check if a string is used earlier
+  // this prevends not allowed users from sending a url to the server
+  // tocheck = <string>
+  let checkencryption = async (tocheck) => {
+    if (tocheck) {
+      checkkey = (key) => {
+        return new Promise(resolve => {
+          db.collection('checkencryption').find({key: key}).toArray((err, result) => {
+            resolve(result)
+          })
+        })
+      }
+      createkey = (key) => {
+        return new Promise(resolve => {
+          db.collection('checkencryption').insertOne({key: key}, (err, res) => {
+            resolve(res)
+          })
+        })
+      }
+      let dboutput = await checkkey(tocheck)
+      if (dboutput[0] && dboutput[0].key == tocheck) {
+        log('Blocked request with a already used key')
+        return false
+      } else {
+        let createstatus = await createkey(tocheck)
+        return true
+      }
+    } else {
+      log('Blocked request with a already used key')
+      return false
     }
   }
 

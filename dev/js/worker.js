@@ -1,3 +1,5 @@
+const log = console.log
+
 let JsonFetch = (data, callback) => {
   fetch(data.url, {
     method: 'post',
@@ -85,7 +87,7 @@ self.onmessage = function (msg) {
       })
       break;
     default:
-      console.log('wut what do i need to do?')
+      log(`Can't handele message`)
   }
 }
 
