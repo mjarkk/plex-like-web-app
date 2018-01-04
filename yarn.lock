@@ -1509,6 +1509,10 @@ qs@~6.3.0:
   version "6.3.2"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.3.2.tgz#e75bd5f6e268122a2a0e0bda630b2550c166502c"
 
+questions@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/questions/-/questions-0.0.6.tgz#79ed146417680b9c67af025e7c4ab546a9909ed9"
+
 randomstring@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/randomstring/-/randomstring-1.1.5.tgz#6df0628f75cbd5932930d9fe3ab4e956a18518c3"

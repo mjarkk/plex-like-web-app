@@ -42,3 +42,4 @@ open in a text editor **conf/servconfig.json**
 - :x: Home
 - :x: Music
 - :x: URL handler
+- :x: Change color scheme

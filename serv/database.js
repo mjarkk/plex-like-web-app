@@ -9,8 +9,10 @@ const fs = require('fs-extra')
 const CryptoJS = require('crypto-js')
 const pbkdf2 = require('pbkdf2-sha256')
 const randomstring = require('randomstring')
-const check = require('./check.js')
 const sha1File = require('sha1-file')
+const questions = require('questions')
+
+const check = require('./check.js')
 const globvars = {
   serverconf: './conf/servconfig.json'
 }
@@ -25,8 +27,8 @@ let database
 // connect to the database
 MongoClient.connect(globconf.dburl, (err, dbase) => {
   if (err) {
-    log(err)
-    log('no mongodb database :(')
+    log(`can't connect to database :(`, err)
+    log(`try to change the data inside conf/servconfig.json`)
     process.exit()
   }
   database = dbase
@@ -55,6 +57,21 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   }
   // start checking/creating of the tables this function needs a array with all the tabel names
   ensuredb(['users','images','checkencryption'])
+
+  // check if all the data is made to start the server
+  x.check = (callback) => setTimeout(() => {
+    let count = db.collection('users').find().count()
+    count.then(output => {
+      if (output == 0) {
+        callback({
+          status: false,
+          users: true
+        })
+      } else {
+        callback({status: true})
+      }
+    })
+  }, 100)
 
   // create user
   // data = {

@@ -2,7 +2,7 @@
   "name": "plex",
   "version": "1.0.0",
   "description": "a plex like web app",
-  "main": "serv.js",
+  "main": "serv.manager.js",
   "scripts": {
     "start": "node serv.manager.js"
   },
@@ -29,6 +29,7 @@
     "npm-sass": "^2.2.1",
     "path": "^0.12.7",
     "pbkdf2-sha256": "^1.1.1",
+    "questions": "^0.0.6",
     "randomstring": "^1.1.5",
     "sha1-file": "^1.0.0",
     "sha256": "^0.2.0",

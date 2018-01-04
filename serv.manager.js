@@ -6,61 +6,114 @@ const shell = require('shelljs')
 const fs = require('fs-extra')
 const colors = require('colors')
 const watch = require('node-watch')
+const questions = require('questions')
+const MongoClient = require('mongodb').MongoClient
 
-// servconfig
-let globconf = require('./conf/servconfig.json')
+global.log = console.log
+
+// check if there is already a config file
+if (!fs.existsSync('./conf/servconfig.json')) {
+  fs.copySync('./conf/basic-conf.json', './conf/servconfig.json')
+  log('created config file')
+}
 
 // old content of 'conf/servconfig.json'
 let serverconffile = './conf/servconfig.json'
 let oldserverconfig = {}
 
-// nodemon files
-let nodemonfile = 'nodemon.json'
+// servconfig
+global.globconf = require(serverconffile)
 
-fs.readJson(serverconffile, (err, data) => {
-  oldserverconfig = data
-})
+// database file
+const dba = require('./serv/database.js')
 
-// check if the user has installed 'nodemon'
-if (globconf.dev && !shell.which('nodemon')) {
-  console.log('You don\'t have nodemon installed, install it by typing: npm i -g nodemon'.red)
-  process.exit()
-}
-
-// a function for tricking nodemon to restart
-let restart = () => setTimeout(() => {
-  fs.readJson(nodemonfile, (err, data) => {
-    data.trickrestart = !data.trickrestart
-    fs.outputJson(nodemonfile, data, err => {
-      console.log('tried to restart the server'.green)
-    })
-  })
-}, 2000)
-
-if (globconf.dev) {
-  watch(serverconffile, { recursive: true }, (evt, name) => {
-    fs.readJson(serverconffile, (err, data) => {
-      if (data.dev !== oldserverconfig.dev ||
-        data.port != oldserverconfig.port ||
-        JSON.stringify(data.imagedirs) != JSON.stringify(oldserverconfig.imagedirs) ||
-        JSON.stringify(data.moviedirs) != JSON.stringify(oldserverconfig.moviedirs) ||
-        JSON.stringify(data.musicdirs) != JSON.stringify(oldserverconfig.musicdirs)
-      ) {
-        restart()
+// this function tests if the database exists and works.
+// this also tests if there is already a user, if not it will aks the user to create one (this will be a administrator accound)
+let blockcheck = false
+let checkdb = () => {
+  if (typeof dba.check == 'function') {
+    dba.check(output => {
+      if (!blockcheck) {
+        if (output.status) {
+          runbase()
+        } else {
+          if (output.users) {
+            // need to create user accound
+            log('Need to create a user enter a username and password')
+            questions.askOne({ info: 'Username' }, (username) => {
+              questions.askOne({ info: 'Password' }, (password) => {
+                dba.createuser({username: username, password: password, check: false},() => {
+                  log('created user')
+                  log('start server')
+                  runbase()
+                })
+              })
+            })
+          }
+        }
       }
-      oldserverconfig = data
+      blockcheck = true
     })
-  })
-}
-
-// if dev is true run the script using nodemon
-if (globconf.dev) {
-  setTimeout(() => {
-    shell.exec('nodemon', {async: true}, () => {})
-  }, 500)
-} else {
-  // run the script forever
-  while (true) {
-    shell.exec('node serv.js')
+  } else if(!blockcheck) {
+    setTimeout(() => {
+      checkdb()
+    }, 100)
   }
+
+}
+checkdb()
+
+let runbase = () => {
+
+  // nodemon files
+  let nodemonfile = 'nodemon.json'
+
+  fs.readJson(serverconffile, (err, data) => {
+    oldserverconfig = data
+  })
+
+  // check if the user has installed 'nodemon'
+  if (globconf.dev && !shell.which('nodemon')) {
+    log('You don\'t have nodemon installed, install it by typing: npm i -g nodemon'.red)
+    process.exit()
+  }
+
+  // a function for tricking nodemon to restart
+  let restart = () => setTimeout(() => {
+    fs.readJson(nodemonfile, (err, data) => {
+      data.trickrestart = !data.trickrestart
+      fs.outputJson(nodemonfile, data, err => {
+        log('tried to restart the server'.green)
+      })
+    })
+  }, 2000)
+
+  if (globconf.dev) {
+    watch(serverconffile, { recursive: true }, (evt, name) => {
+      fs.readJson(serverconffile, (err, data) => {
+        if (data.dev !== oldserverconfig.dev ||
+          data.port != oldserverconfig.port ||
+          JSON.stringify(data.imagedirs) != JSON.stringify(oldserverconfig.imagedirs) ||
+          JSON.stringify(data.moviedirs) != JSON.stringify(oldserverconfig.moviedirs) ||
+          JSON.stringify(data.musicdirs) != JSON.stringify(oldserverconfig.musicdirs)
+        ) {
+          restart()
+        }
+        oldserverconfig = data
+      })
+    })
+  }
+
+  // if dev is true run the script using nodemon
+  if (globconf.dev) {
+    setTimeout(() => {
+      shell.exec('nodemon serv.js', {async: true}, () => {})
+    }, 500)
+  } else {
+    // run the script forever
+    while (true) {
+      shell.exec('node serv.js')
+    }
+  }
+
 }
