@@ -30,8 +30,22 @@ and it's of course mobile friendly
 open in a text editor **conf/servconfig.json**
 
 ## Bugs
-- On windows the server will not stop running if you press ctrl + c, Solution: on windows open task manager and kill all nodejs services
+- On windows the server will NOT stop running if you press ctrl + c, Solution: on windows open task manager and kill all nodejs services
 - If you change dev mode in the settings the server will not stop the live reload or will not start live the live reload, Solution: manually restart the server.
+
+## Tested on:
+### Linux (ubuntu 17.10)
+- serv.manager.js :heavy_check_mark:
+- serv.js :heavy_check_mark:
+- serv/img.js :heavy_check_mark:
+- serv/js.js :heavy_check_mark:
+- serv/sass.js :heavy_check_mark:
+- serv/database.js :heavy_check_mark:
+- serv/errorhandeler.js :question:
+### Windows
+- * :question: (Have not tested on windows)
+### Mac OS
+- * :question: (Have not tested on Mac OS)
 
 ## Working on:
 - :heavy_check_mark: Settings
@@ -43,4 +57,5 @@ open in a text editor **conf/servconfig.json**
 - :x: Music
 - :x: URL handler
 - :x: Change color scheme
+- :x: Make tests to check if everyting works fine
 - :heavy_check_mark: Setup
