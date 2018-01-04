@@ -56,6 +56,6 @@ open in a text editor **conf/servconfig.json**
 - :x: Home
 - :x: Music
 - :x: URL handler
-- :x: Change color scheme
+- :x: Switch from a white to black color scheme inside settings
 - :x: Make tests to check if everyting works fine
 - :heavy_check_mark: Setup
