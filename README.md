@@ -43,3 +43,4 @@ open in a text editor **conf/servconfig.json**
 - :x: Music
 - :x: URL handler
 - :x: Change color scheme
+- :heavy_check_mark: Setup
