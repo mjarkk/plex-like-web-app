@@ -58,6 +58,7 @@ const dba = require('./serv/database.js')
 const check = require('./serv/check.js')
 const appdata = require('./serv/appdatahandeler.js')
 const img = require('./serv/img.js')
+const video = require('./serv/video.js')
 
 // get all content from the css file
 app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, items) {

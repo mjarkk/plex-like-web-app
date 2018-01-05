@@ -52,7 +52,7 @@ open in a text editor **conf/servconfig.json**
 - :heavy_check_mark: Images list
 - :heavy_check_mark: Image Viewer
 - :x: Movies list
-- :x: Movies viewer
+- :heavy_check_mark: Movies viewer
 - :x: Home
 - :x: Music
 - :x: URL handler
