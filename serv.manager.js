@@ -61,7 +61,15 @@ let checkdb = () => {
   }
 
 }
-checkdb()
+if (!shell.which('ffmpeg')) {
+  log('no ffmpeg found')
+  log('you need ffmpeg to run this project')
+  log('If you are using UBUNTU try this: apt install ffmpeg')
+  log('If you are using WINDOWS try this: https://www.wikihow.com/Install-FFmpeg-on-Windows')
+  process.exit()
+} else {
+  checkdb()
+}
 
 let runbase = () => {
 
