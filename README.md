@@ -47,7 +47,7 @@ open in a text editor **conf/servconfig.json**
 ### Mac OS
 - * :question: (Have not tested on Mac OS)
 
-## Working on:
+## Already started working on:
 - :heavy_check_mark: Settings
 - :heavy_check_mark: Images list
 - :heavy_check_mark: Image Viewer
