@@ -9,6 +9,10 @@ const watch = require('node-watch')
 const questions = require('questions')
 const MongoClient = require('mongodb').MongoClient
 
+// chmod +x the dev/shaka-packager/linux and dev/shaka-packager/macos
+shell.exec('chmod +x dev/shaka-packager/linux')
+shell.exec('chmod +x dev/shaka-packager/macos')
+
 global.log = console.log
 
 // check if there is already a config file
