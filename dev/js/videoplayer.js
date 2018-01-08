@@ -3,7 +3,7 @@
 window.LoadedScripts['videoplayer'] = true
 
 
-var manifestUri = '//storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd';
+var manifestUri = '/video/MPD/videoid/mpd';
 
 let initApp = () => {
   shaka.polyfill.installAll();

@@ -125,6 +125,8 @@ app.get('/ping',(req, res) => {
   res.send('pong')
 })
 
+app.get('/video/MPD/:videoid/:reqfile', video.sendMPD)
+
 // a route to get all the needed javascript files
 app.get('*/basic.js', (req, res) => {
   if (req.path.indexOf('%2F') != -1 || req.path.indexOf('..') != -1) {

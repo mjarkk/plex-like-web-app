@@ -22,7 +22,26 @@ const x = exports
 const ffmpeg = `ffmpeg -y -i`
 
 // TESTING...
-let test = false
+let test = true
+
+x.sendMPD = (req,res) => {
+  let file = req.params.reqfile
+  let videoid = req.params.videoid
+  if (file && videoid) {
+    if (test) {
+      let dirname = path.resolve(__dirname,'..','appdata/movies/public/')
+      if (file == 'mpd') {
+        res.sendFile(path.resolve(dirname,'video.mpd'))
+      } else {
+        res.sendFile(path.resolve(dirname,file))
+      }
+    } else {
+      res.send('this function is not included when test = false, see serv/video.js')
+    }
+  } else {
+    res.send('404')
+  }
+}
 
 if (test) {
   // this will give erros if set to true, this is purly for testing
