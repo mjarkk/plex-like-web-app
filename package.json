@@ -7,7 +7,7 @@
     "start": "node serv.manager.js"
   },
   "author": "mjarkk",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "dependencies": {
     "await-fs": "^1.0.0",
     "body-parser": "^1.18.2",
