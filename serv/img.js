@@ -171,7 +171,7 @@ let filesloop = (index) => {
 
 // check if the database file is connected to the database
 let checkdb = () => {
-  (dba.getfileindex) ? dirloop(0) : setTimeout(() => checkdb(), 1000)
+  dba.getfileindex ? dirloop(0) : setTimeout(() => checkdb(), 1000)
 }
 checkdb()
 
