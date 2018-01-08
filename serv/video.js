@@ -74,7 +74,6 @@ let filesloop = (i) => {
   if (fc) {
     if (fc.endsWith('.mkv') || fc.endsWith('.mp4')) {
       compile(fc, (log) => {
-        log(fc, log)
         next()
       })
     } else {
@@ -221,7 +220,7 @@ let compile = (videofile, callback) => {
           }
         }
         let cleanup = (input, callback) => {
-          // this will cleanup all files that are useless and will only take up space 
+          // this will cleanup all files that are useless and will only take up space
           let removefiles = ['movie.mp4','movie720.mp4','movie540.mp4','movie360.mp4']
           let removefile = (index) => {
             let toRemove = removefiles[index]
