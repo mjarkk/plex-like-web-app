@@ -133,7 +133,7 @@ let compile = (videofile, callback) => {
               next()
             } else {
               // create a mp4 copy of the file
-              exec(`${ffmpeg} ${ltf(input)} ${ltf(nextinput)}`, () => next())
+              exec(`${ffmpeg} ${ltf(input)} -codec copy ${ltf(nextinput)}`, () => next())
             }
           } else {
             log('input file does not exsist')
@@ -209,13 +209,15 @@ let compile = (videofile, callback) => {
           `--mpd_output ${dir}video.mpd ` + // the mpd file to inform the shaka player
           `--min_buffer_time 4 ` + // a minimum buffer time of 4 i have dune this because this will meybe be ran on slow server that can't handele to much at the same time
           `--segment_duration 4` // the segment duration
-          if (checkp(`shaka-movie_audio.mp4`) && checkp(`shaka-movie_video.mp4`) && checkp(`video.mpd`)) {
+          if (checkp(`shakacreated.dune`)) {
             // shaka files already exsist the next steps
             next()
           } else {
             // video doesn't exsist
             exec(command, () => {
-              next()
+              fs.ensureFile(path.resolve(__dirname,'..',`${dir}shakacreated.dune`) ,() => {
+                next()
+              })
             })
           }
         }
