@@ -73,6 +73,7 @@ let filesloop = (i) => {
   let next = () => filesloop(i + 1)
   if (fc) {
     if (fc.endsWith('.mkv') || fc.endsWith('.mp4')) {
+      log(`compress:`,fc)
       compile(fc, (log) => {
         next()
       })
@@ -91,7 +92,7 @@ let compile = (videofile, callback) => {
       callback({status:false})
     } else {
       // this will give erros if set to true, this is purly for testing
-      const ffmpeg = `ffmpeg -y -i`
+      const ffmpeg = `ffmpeg -v quiet -stats -y -i`
       const videodir = `./appdata/movies/public/${sum}/`
 
       // make shure the direcotry exsist
@@ -105,34 +106,50 @@ let compile = (videofile, callback) => {
         let p720 = (from, to) => `${ffmpeg} ${ltf(from)} `+
         `-bufsize 1000k -maxrate 1500k -b:v 1500k `+
         `-ac 2 -ab 256k -ar 48000 -c:v libx264 ` +
+        `-preset veryfast -c:a copy ` +
         `-x264opts 'keyint=27:min-keyint=27:no-scenecut' `+
         ` -vf "scale=-2:720" ${ltf(to)}`
         let p540 = (from, to) => `${ffmpeg} ${ltf(from)} `+
         `-bufsize 500k -maxrate 800k -b:v 800k `+
         `-ac 2 -ab 128k -ar 44100 -c:v libx264 ` +
+        `-preset veryfast -c:a copy ` +
         `-x264opts 'keyint=27:min-keyint=27:no-scenecut' `+
         ` -vf "scale=-2:540" ${ltf(to)}`
         let p360 = (from, to) => `${ffmpeg} ${ltf(from)} `+
         `-bufsize 400k -maxrate 400k -b:v 400k `+
         `-ac 2 -ab 64k -ar 22050 -c:v libx264 ` +
+        `-preset veryfast -c:a copy ` +
         `-x264opts 'keyint=27:min-keyint=27:no-scenecut' `+
         ` -vf "scale=-2:360" ${ltf(to)}`
 
         // a wraper for shell.exec with async functionality
         let exec = (input, callback) => shell.exec(input, { async: true }, () => callback())
+        // presolve is short for path resove and is a wrapper around path.resolve
+        let presolve = (input) => path.resolve(__dirname,'..',input)
+        // fexsist is short for file exsist this is a warpper around presolve
+        let fexsist = (input) => fs.existsSync(presolve(input))
 
         // input is the oritinal file location relative from the root of this project OR from the root of the pc
         let MakeMP4 = (input, callback) => {
 
           // next is a wrapper for the make720p function
-          let next = () => fs.ensureFile(path.resolve(__dirname,'..',nextinput + '.dune'), err => Make720P(nextinput, callback))
+          let next = () => fs.ensureFile(presolve(nextinput + '.dune'), err => Make720P(nextinput, callback))
           let nextinput = `${videodir}movie.mp4`
           if (fs.existsSync(input)) {
-            if (fs.existsSync(path.resolve(__dirname,'..',nextinput + '.dune'))) {
+            if (fexsist(nextinput + '.dune') && fexsist(nextinput)) {
               // a movie file of the image does already exsist skip this step
-              next()
+              if (fexsist('shaka-movie_video.mp4')) {
+                let inputdir = path.parse(nextinput).dir + '/'
+                cleanup(inputdir, callback)
+              } else {
+                next()
+              }
+            } else if (fexsist('shaka-movie_video.mp4')) {
+              // the the complete movie is already compiled retrun true
+              callback({status: true})
             } else {
               // create a mp4 copy of the file
+              log(`Creating full mp4 file`)
               exec(`${ffmpeg} ${ltf(input)} -codec copy ${ltf(nextinput)}`, () => next())
             }
           } else {
@@ -144,13 +161,22 @@ let compile = (videofile, callback) => {
         // the input is the ouput file from MakeMP4
         let Make720P = (input, callback) => {
           let nextinput = `${videodir}movie720.mp4`
-          let next = () => fs.ensureFile(path.resolve(__dirname,'..',nextinput + '.dune'), err => Make540P(nextinput, callback))
-          if (fs.existsSync(input)) {
-            if (fs.existsSync(path.resolve(__dirname,'..',nextinput + '.dune'))) {
+          let next = () => fs.ensureFile(presolve(nextinput + '.dune'), err => Make540P(nextinput, callback))
+          if (fexsist(input)) {
+            if (fexsist(nextinput + '.dune') && fexsist(nextinput)) {
               // a movie file of the image does already exsist skip this step
               next()
+            } else if (fexsist('shaka-movie_video.mp4')) {
+              // the the complete movie is already compiled retrun true
+              if (fexsist(nextinput)) {
+                let inputdir = path.parse(nextinput).dir + '/'
+                cleanup(inputdir, callback)
+              } else {
+                callback({status: true})
+              }
             } else {
               // create a mp4 copy of the file
+              log(`Creating 720p version`)
               exec(p720(input,nextinput), () => next())
             }
           } else {
@@ -161,12 +187,21 @@ let compile = (videofile, callback) => {
         let Make540P = (input, callback) => {
           let nextinput = `${videodir}movie540.mp4`
           let next = () => fs.ensureFile(path.resolve(__dirname,'..',nextinput + '.dune'), err => Make360P(input, callback))
-          if (fs.existsSync(input)) {
-            if (fs.existsSync(path.resolve(__dirname,'..',nextinput + '.dune'))) {
+          if (fexsist(input)) {
+            if (fexsist(nextinput + '.dune') && fexsist(nextinput)) {
               // a movie file of the image does already exsist skip this step
               next()
+            } else if (fexsist('shaka-movie_video.mp4')) {
+              // the the complete movie is already compiled retrun true
+              if (fexsist(nextinput)) {
+                let inputdir = path.parse(nextinput).dir + '/'
+                cleanup(inputdir, callback)
+              } else {
+                callback({status: true})
+              }
             } else {
               // create a mp4 copy of the file
+              log(`Creating 540p version`)
               exec(p540(input,nextinput), () => next())
             }
           } else {
@@ -177,12 +212,21 @@ let compile = (videofile, callback) => {
         let Make360P = (input, callback) => {
           let next = () => fs.ensureFile(path.resolve(__dirname,'..',nextinput + '.dune'), err => CreateShakaPackage(input, callback))
           let nextinput = `${videodir}movie360.mp4`
-          if (fs.existsSync(input)) {
-            if (fs.existsSync(path.resolve(__dirname,'..',nextinput + '.dune'))) {
+          if (fexsist(input)) {
+            if (fexsist(nextinput + '.dune') && fexsist(nextinput)) {
               // a movie file of the image does already exsist skip this step
               next()
+            } else if (fexsist('shaka-movie_video.mp4')) {
+              // the the complete movie is already compiled retrun true
+              if (fexsist(nextinput)) {
+                let inputdir = path.parse(nextinput).dir + '/'
+                cleanup(inputdir, callback)
+              } else {
+                callback({status: true})
+              }
             } else {
               // create a 360p version of the file
+              log(`Creating 360p version`)
               exec(p360(input,nextinput), () => next())
             }
           } else {
@@ -193,27 +237,28 @@ let compile = (videofile, callback) => {
         let CreateShakaPackage = (input, callback) => {
           let dir = path.parse(input).dir + '/'
           let next = () => cleanup(dir, callback)
-          let checkp = (input) => fs.existsSync(path.resolve(__dirname,'..',`${dir}${input}`))
+          let checkp = (input) => fexsist(`${dir}${input}`)
           let oss = os.platform()
           let command = `./dev/shaka-packager/`+
           `${(oss == 'win32') ? 'windows.exe' : (oss == 'darwin') ? 'macos' : 'linux' } ` + // check witch program it needs to use
-          checkp(`movie.mp4`) ? `input=${dir}movie.mp4,stream=audio,output=${dir}shaka-movie_audio.mp4 ` : '' + // the original (mp4 version) video sound
-          checkp(`movie.mp4`) ? `input=${dir}movie.mp4,stream=video,output=${dir}shaka-movie_video.mp4 ` : '' + // the original (mp4 version) video
-          checkp(`movie720.mp4`) ? `input=${dir}movie720.mp4,stream=audio,output=${dir}shaka-movie720_audio.mp4 ` : '' + // the 720p video sound
-          checkp(`movie720.mp4`) ? `input=${dir}movie720.mp4,stream=video,output=${dir}shaka-movie720_video.mp4 ` : '' + // the 720p video
-          checkp(`movie540.mp4`) ? `input=${dir}movie540.mp4,stream=audio,output=${dir}shaka-movie540_audio.mp4 ` : '' + // the 540p video sound
-          checkp(`movie540.mp4`) ? `input=${dir}movie540.mp4,stream=video,output=${dir}shaka-movie540_video.mp4 ` : '' + // the 540p video
-          checkp(`movie360.mp4`) ? `input=${dir}movie360.mp4,stream=audio,output=${dir}shaka-movie360_audio.mp4 ` : '' + // the 360p video sound
-          checkp(`movie360.mp4`) ? `input=${dir}movie360.mp4,stream=video,output=${dir}shaka-movie360_video.mp4 ` : '' + // the 360p video
+          `${checkp(`movie.mp4`) ? `input=${dir}movie.mp4,stream=audio,output=${dir}shaka-movie_audio.mp4 ` : '' }`+ // the original (mp4 version) video sound
+          `${checkp(`movie.mp4`) ? `input=${dir}movie.mp4,stream=video,output=${dir}shaka-movie_video.mp4 ` : '' }`+ // the original (mp4 version) video
+          `${checkp(`movie720.mp4`) ? `input=${dir}movie720.mp4,stream=audio,output=${dir}shaka-movie720_audio.mp4 ` : '' }`+ // the 720p video sound
+          `${checkp(`movie720.mp4`) ? `input=${dir}movie720.mp4,stream=video,output=${dir}shaka-movie720_video.mp4 ` : '' }`+ // the 720p video
+          `${checkp(`movie540.mp4`) ? `input=${dir}movie540.mp4,stream=audio,output=${dir}shaka-movie540_audio.mp4 ` : '' }`+ // the 540p video sound
+          `${checkp(`movie540.mp4`) ? `input=${dir}movie540.mp4,stream=video,output=${dir}shaka-movie540_video.mp4 ` : '' }`+ // the 540p video
+          `${checkp(`movie360.mp4`) ? `input=${dir}movie360.mp4,stream=audio,output=${dir}shaka-movie360_audio.mp4 ` : '' }`+ // the 360p video sound
+          `${checkp(`movie360.mp4`) ? `input=${dir}movie360.mp4,stream=video,output=${dir}shaka-movie360_video.mp4 ` : '' }`+ // the 360p video
           `--profile on-demand ` + // got this command from the internet don't know what is does
           `--mpd_output ${dir}video.mpd ` + // the mpd file to inform the shaka player
           `--min_buffer_time 4 ` + // a minimum buffer time of 4 i have dune this because this will meybe be ran on slow server that can't handele to much at the same time
           `--segment_duration 4` // the segment duration
-          if (checkp(`shakacreated.dune`)) {
-            // shaka files already exsist the next steps
+          if (checkp(`shakacreated.dune`) && checkp('shaka-movie_audio.mp4') && checkp('shaka-movie_video.mp4')) {
+            // shaka files already exsist go to the next steps
             next()
           } else {
             // video doesn't exsist
+            log(`Creating web player files`)
             exec(command, () => {
               fs.ensureFile(path.resolve(__dirname,'..',`${dir}shakacreated.dune`) ,() => {
                 next()
