@@ -1,18 +1,18 @@
 # A plex like web app
 ## Goal
-A site where you can view you images, movies and music on the 2017 way.
-"2017 way" That means it needs to be stabele so if you are offline the data still loads,
-all the animations are somooth,
-auto changing resolution in movies depending on your network speed,
-all api data is secure from end to end,
-you can share everyting,
-load a page before you have even clicked it
-and it's of course mobile friendly
-### Some other Goals
-- Changing theme's light, dark and maybe custom css theme's
-- Images are loading like medium's
-- And ofcourse all basic things that a server/client needs: (login, settings, etc)
-
+A site where you can view you images, movies and music on the 2017 way.  
+"2017 way" means it needs to be stabele so if you are offline the data still loads,  
+all the animations are somooth,  
+auto changing resolution in movies depending on your network speed,  
+all api data is secure from end to end,  
+you can share everyting,  
+load a page before you have even clicked it  
+and it needs to be mobile friendly of course.  
+### Some other Goals  
+- Changing theme's light, dark and maybe custom css theme's  
+- Images are loading like medium's  
+- And ofcourse all basic things that a server/client needs: (login, settings, etc)  
+  
 ## How to use
 ### Install
 - open a terminal and type:
