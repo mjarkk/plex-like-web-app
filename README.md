@@ -1,7 +1,7 @@
 # A plex like web app
 ## Goal
 A site where you can view you images, movies and music on the 2017 way.
-"2017 way" This means it needs to be stabele so if you are offline the data still loads,
+"2017 way" That means it needs to be stabele so if you are offline the data still loads,
 all the animations are somooth,
 auto changing resolution in movies depending on your network speed,
 all api data is secure from end to end,
@@ -42,7 +42,7 @@ open in a text editor **conf/servconfig.json**
 - serv/js.js :heavy_check_mark:
 - serv/sass.js :heavy_check_mark:
 - serv/database.js :heavy_check_mark:
-- serv/errorhandeler.js :question:
+- serv/errorhandeler.js :question: (have write this file but never tested if the file works)
 ### Windows
 - * :question: (Have not tested on windows)
 ### Mac OS
