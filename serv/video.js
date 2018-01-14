@@ -289,8 +289,15 @@ let compile = (videofile, callback) => {
           }
           removefile(0)
         }
-
-        MakeMP4(videofile, callback)
+        if (
+          !path.resolve(__dirname, '..', videodir, 'shaka-movie_video.mp4') &&
+          !path.resolve(__dirname, '..', videodir, 'shaka-movie_audio.mp4') &&
+          !path.resolve(__dirname, '..', videodir, 'shakacreated.dune') &&
+          !path.resolve(__dirname, '..', videodir, 'video.mpd')) {
+          MakeMP4(videofile, callback)
+        } else {
+          callback({status: true})
+        }
       })
     }
   })

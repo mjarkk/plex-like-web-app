@@ -1,6 +1,7 @@
 const fs = require('fs-extra')
 const watch = require('node-watch')
 const UglifyJS = require('uglify-es')
+const Babel = require('babel-core')
 
 watch('./dev/js/', { recursive: true }, (evt, name) => {
   comiple(name)
@@ -29,11 +30,11 @@ let comiple = (name) => {
   } else {
     // uglify the file and place in the www/js/ direcotry
     fs.readFile(name, 'utf8', (err, data) => {
-      let r = UglifyJS.minify(data)
-      if (r.error) {
-        log(`can't uglify file:`,r.error)
+      let BabelOutput = Babel.transform(data, {minified: true})
+      if (BabelOutput.code) {
+        log(`can't uglify file:`,name)
       } else {
-        fs.outputFile(to, r.code, err => {
+        fs.outputFile(to, BabelOutput.code, err => {
           log(`uglifyed file: ${name}`)
         })
       }
