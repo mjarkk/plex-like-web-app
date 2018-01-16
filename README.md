@@ -12,7 +12,7 @@ and it needs to be mobile friendly of course.
 - Changing theme's light, dark and maybe custom css theme's  
 - Images are loading like medium's  
 - And ofcourse all basic things that a server/client needs: (login, settings, etc)  
-  
+
 ## How to use
 ### Install
 - open a terminal and type:
@@ -52,7 +52,7 @@ open in a text editor **conf/servconfig.json**
 - :heavy_check_mark: Settings
 - :heavy_check_mark: Images list
 - :heavy_check_mark: Image Viewer
-- :x: Movies list
+- :heavy_check_mark: Movies list
 - :heavy_check_mark: Movies viewer
 - :x: Home
 - :x: Music

@@ -55,7 +55,11 @@ var home = new Vue({
     }
   },
   methods: {
+    fetchMovieList: () => {
+      // load movie list
+    },
     openimg: (image) => reqfile('imgviewer', () => {
+      // open image
       document.querySelector('.img-viewer-vue').style.display = 'block'
       imgviewer.showimg({
         aspect: image.aspect,
@@ -64,12 +68,14 @@ var home = new Vue({
       })
     }),
     ReturnDay: (year, month, day) => {
+      // return a full date with the the day name and month name
       const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
       const date = new Date(`${year.replace(/-/g,'')}-${month.replace(/-/g,'')}-${day.replace(/-/g,'')}`)
       return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()].substring(0,3)}`
     },
     fetchnewimgs: (callback) => {
+      // fetch list with images
       if (!home.images.rechedend) {
         home.images.imagesindex = home.images.imagesindex + 1
 
@@ -95,7 +101,7 @@ var home = new Vue({
       }
     },
     ImgPreMake: (from) => {
-      // creates a object with all images you will need
+      // creates a object with all images you will need that the browser can pre-render
       let imgs = home.images.images
       let time = {}
       for (var from = 0; from < imgs.length; from++) {
@@ -157,12 +163,11 @@ var home = new Vue({
     },
     LoadImages: (from) => {
       // a method for loading images
-      // /image/ {{ id }} /false/false
       let forimgs = (id) => {
         if (home.images.images[id]) {
           let image = home.images.images[id]
           let LoadingImg = new Image(image.RenderWidth, image.RenderHeight)
-          LoadingImg.src = `/image/${image.id}/60/${image.RenderWidth}x${image.RenderHeight}/false`
+          LoadingImg.src = `/image/${image.id}/60/${image.RenderWidth}x${image.RenderHeight}/false` // the last false means it is webp still need to support that
           image.url = LoadingImg.src
           LoadingImg.onload = () => {
             image.show = true
@@ -223,6 +228,8 @@ var home = new Vue({
         .catch((e) => true)
       } else if (newval == 'images' && !home.images.loadedBasic) {
         home.fetchnewimgs()
+      } else if (newval == 'movies') {
+        home.fetchMovieList()
       }
     }
   },
@@ -260,7 +267,6 @@ var home = new Vue({
 // a webworker Event Listener this handels all the callback data from the webworker
 WebWorker.addEventListener('message', (msg) => {
   const data = msg.data
-
   if (data.what == 'getusersettings' && data.status) {
     // all the user settings
     const inf = data.data
