@@ -12,6 +12,14 @@ const path = require('path')
 const shell = require('shelljs')
 const os = require('os')
 
+// the basic ffmpeg input
+const ffmpegAdd = (toadd) => `ffmpeg -v quiet -stats ${(typeof toadd == 'string') ? `${toadd} ` : ''}-y -i`
+const ffmpeg = ffmpegAdd()
+
+
+// replace all spaces with "\ "
+let ltf = (inp) => inp.replace(/ /g,'\\ ')
+
 // database file
 const dba = require('./database.js')
 
@@ -73,14 +81,66 @@ let filesloop = (i) => {
   let next = () => filesloop(i + 1)
   if (fc) {
     if (fc.endsWith('.mkv') || fc.endsWith('.mp4')) {
-      log(`compress:`,fc)
-      compile(fc, (log) => {
-        next()
+      sha1File(fc, (error, sum) => {
+        if (error) {
+          next()
+        } else {
+          let dir = path.resolve(__dirname,`..`,`appdata/movies/public/${sum}`)
+          let fe = (file) => fs.existsSync(`${dir}/${file}`)
+          log(`compress: ${fc}`)
+          compile(fc, (complieLog) => {
+            let poster = path.resolve(__dirname,`..`,`appdata/movies/public/${sum}/poster.png`)
+            if (!fe('poster.png')) {
+              shell.exec(`${ffmpegAdd('-ss 00:07:00')} ${ltf(fc)} -vframes 1 -q:v 2 ${ltf(poster)}`, { async: true }, () => {
+                CreateTimeLine()
+              })
+            } else {
+              CreateTimeLine()
+            }
+          })
+          let CreateTimeLine = () => {
+            if (!fe('preview/t-1.jpg') && !fe('preview/t-01.jpg') && !fe('preview/t-001.jpg') && !fe('preview/t-0001.jpg') && !fe('preview/t-00001.jpg')) {
+              let poster = path.resolve(dir,`preview/t-%03d.jpg`)
+              fs.ensureDir(path.resolve(dir,`preview/`), err => {
+                shell.exec(`${ffmpeg} ${ltf(fc)} -preset veryfast -c:a copy -vf fps=1/20,scale=-1:120 ${ltf(poster)}`, { async: true }, () => {
+                  db()
+                })
+              })
+            } else {
+              db()
+            }
+          }
+          let db = () => {
+            // create a database entery
+            dba.CreateVideoProviel({
+              original: fc,
+              dir: dir,
+              files: {
+                preview: (!fe('preview/t-1.jpg') || !fe('preview/t-01.jpg') || !fe('preview/t-001.jpg') || !fe('preview/t-0001.jpg') || !fe('preview/t-00001.jpg')),
+                mpd: fe('video.mpd'),
+                poster: fe('poster.png'),
+                shakaCreated: fe('shakacreated.dune'),
+                shakaVideo: fe('shaka-movie_video.mp4'),
+                shakaAudio: fe('shaka-movie_audio.mp4'),
+                shakaVideo360: fe('shaka-movie360_video.mp4'),
+                shakaAudio360: fe('shaka-movie360_audio.mp4'),
+                shakaVideo540: fe('shaka-movie540_video.mp4'),
+                shakaAudio540: fe('shaka-movie540_audio.mp4'),
+                shakaVideo720: fe('shaka-movie720_video.mp4'),
+                shakaAudio720: fe('shaka-movie720_audio.mp4')
+              }
+            }, (dbOutput) => {
+              // log(dbOutput)
+              next()
+            })
+          }
+        }
       })
     } else {
       next()
     }
   } else {
+    log('dune checking all video files')
     // end of check list
   }
 }
@@ -92,7 +152,6 @@ let compile = (videofile, callback) => {
       callback({status:false})
     } else {
       // this will give erros if set to true, this is purly for testing
-      const ffmpeg = `ffmpeg -v quiet -stats -y -i`
       const videodir = `./appdata/movies/public/${sum}/`
 
       // make shure the direcotry exsist
@@ -100,9 +159,6 @@ let compile = (videofile, callback) => {
 
         // input is a basic input string
         let input = `${ffmpeg} ${videofile} `
-
-        // ltf is a function that will replace all spaces with "\ "
-        let ltf = (inp) => inp.replace(/ /g,'\\ ')
         let p720 = (from, to) => `${ffmpeg} ${ltf(from)} `+
         `-bufsize 1000k -maxrate 1500k -b:v 1500k `+
         `-ac 2 -ab 256k -ar 48000 -c:v libx264 ` +

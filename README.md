@@ -14,6 +14,11 @@ and it needs to be mobile friendly of course.
 - And ofcourse all basic things that a server/client needs: (login, settings, etc)  
 
 ## How to use
+### Before you install!
+- This project will take up a lot of space currently it doesn't do anything related to file optimization.
+- This project is not close to a Alpa, Beta, whatever release.
+- Make sure you have a backup of you're files because there are bugs OR sandbox the project.
+
 ### Install
 - open a terminal and type:
 - git clone https://github.com/mjarkk/plex-like-web-app

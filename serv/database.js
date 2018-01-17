@@ -113,6 +113,53 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
 
+  // create a database entery for a specifice video file
+  // data = {
+  //   original: <string (the original file location)>,
+  //   dir: <string (the appdata location for the videos)>,
+  //   files: {
+  //     preview: <boolean (a check if a list of images exsist for every view seconds)>,
+  //     poster: <boolean (post of the movie this might be a picture from the interet or a screenshot from somewhere in the movie)>,
+  //     mpd: <boolean (if video.mpd exsist)>,
+  //     shakaCreated: <boolean (if video.mpd exsist)>,
+  //     shakaVideo: <boolean (if shaka-movie_video.mp4 exsist)>,
+  //     shakaAudio: <boolean (if shaka-movie_audio.mp4 exsist)>,
+  //     shakaVideo360: <boolean (if shaka-movie360_video.mp4 exsist)>,
+  //     shakaAudio360: <boolean (if shaka-movie360_audio.mp4 exsist)>,
+  //     shakaVideo540: <boolean (if shaka-movie540_video.mp4 exsist)>,
+  //     shakaAudio540: <boolean (if shaka-movie540_audio.mp4 exsist)>,
+  //     shakaVideo720: <boolean (if shaka-movie720_video.mp4 exsist)>,
+  //     shakaAudio720: <boolean (if shaka-movie720_audio.mp4 exsist)>
+  //   }
+  // }
+  x.CreateVideoProviel = (data, callback) => {
+    let Call = (data) =>
+      (typeof callback == 'function') ?
+        callback(data) :
+        false // do noting if callback is not a function
+    if (
+      typeof data.original == 'string' &&
+      typeof data.dir == 'string' &&
+      typeof data.files == 'object' &&
+      typeof data.files.poster == 'object' &&
+      typeof data.files.mpd == 'boolean' &&
+      typeof data.files.shakaCreated == 'boolean' &&
+      typeof data.files.shakaVideo == 'boolean' &&
+      typeof data.files.shakaAudio == 'boolean' &&
+      typeof data.files.shakaVideo360 == 'boolean' &&
+      typeof data.files.shakaAudio360 == 'boolean' &&
+      typeof data.files.shakaVideo540 == 'boolean' &&
+      typeof data.files.shakaAudio540 == 'boolean' &&
+      typeof data.files.shakaVideo720 == 'boolean' &&
+      typeof data.files.shakaAudio720 == 'boolean'
+    ) {
+      // video is file
+      Call({status: true})
+    } else {
+      Call({status: false})
+    }
+  }
+
   // get a list of images
   // data = {
   //   req: req,
