@@ -15,7 +15,7 @@ and it needs to be mobile friendly of course.
 
 ## How to use
 ### Before you install!
-- This project will take up a lot of space currently it doesn't do anything related to file optimization.
+- This project will take up a lot of space currently it doesn't do anything related to disk space optimization.
 - This project is not close to a Alpa, Beta, whatever release.
 - Make sure you have a backup of you're files because there are bugs OR sandbox the project.
 
