@@ -2,12 +2,12 @@
 ## Goal
 A site where you can view you images, movies and music on the 2017 way.  
 "2017 way" means it needs to be stabele so if you are offline the data still loads,  
-all the animations are somooth,  
-auto changing resolution in movies depending on your network speed,  
-all api data is secure from end to end,  
-you can share everyting,  
-load a page before you have even clicked it  
-and it needs to be mobile friendly of course.  
+All the animations are somooth,  
+Auto changing resolution in movies depending on your network speed,  
+All api data is secure from end to end,  
+You can share everyting,  
+Load a page before you have even clicked it  
+And it needs to be mobile friendly of course.  
 ### Some other Goals  
 - Changing theme's light, dark and maybe custom css theme's  
 - Images are loading like medium's  
@@ -20,19 +20,19 @@ and it needs to be mobile friendly of course.
 - Make sure you have a backup of you're files because there are bugs OR sandbox the project.
 
 ### Install
-- open a terminal and type:
-- git clone https://github.com/mjarkk/plex-like-web-app
-- yarn install
+- Open a terminal and type:
+- ```git clone https://github.com/mjarkk/plex-like-web-app```
+- ```yarn install```
 
 ### Start
-- yarn start
+- ```yarn start```
 
 ### Update
-- in a terminal type: yarn
-- if that doesn't work remove the node_modules folder and try start again
+- In a terminal type: ```yarn```
+- If that doesn't work remove the node_modules folder and try start again
 
 ### configure
-open in a text editor **conf/servconfig.json**
+Open in a text editor **conf/servconfig.json**
 
 ## Bugs
 - On windows the server will NOT stop running if you press ctrl + c, Solution: on windows open task manager and kill all nodejs services
