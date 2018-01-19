@@ -78,6 +78,24 @@ app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, ite
   addfiles(0)
 }))
 
+// get a list of all videos to request
+app.post('/videoindex/', (req, res) => {
+  let tosend = {
+    req: req,
+    res: res,
+    type: 'json'
+  }
+  dba.checkuser(tosend, (UserData) => dba.getvideolist(tosend, (VideoDataList) => {
+    // user is logedin
+    // if the user doesn't have the rights the database itself will do a response
+    // after that the database is asked for a list of the latest videos
+    res.json({
+      status: true,
+      data: dba.encrypt(VideoDataList, UserData.key)
+    })
+  }))
+})
+
 // get a index of all images to request
 app.post('/imageindex/:index/:amound', (req, res) => {
   let tosend = {
@@ -89,11 +107,11 @@ app.post('/imageindex/:index/:amound', (req, res) => {
   }
   dba.checkuser(tosend, (UserData) => dba.getimglist(tosend, (ImageDataList) => {
     // user is logedin
-    // if the user has not the writes the database itself will do a response
+    // if the user doesn't have the rights the database itself will do a response
     // after that the database is asked for a list of the latest images
     res.json({
       status: true,
-      data: dba.encrypt(ImageDataList,UserData.key)
+      data: dba.encrypt(ImageDataList, UserData.key)
     })
   }))
 })

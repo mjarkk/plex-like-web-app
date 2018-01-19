@@ -185,7 +185,7 @@ checkdb()
 //   webp: <boolean>
 // }
 x.sendimg = (data) => {
-  if (data.req && data.res && typeof(data.id) == 'string' && typeof(data.webp) == 'boolean') {
+  if (data.req && data.res && typeof(data.id) == 'string' && data.id != 'undefined' && data.id != 'NaN' && typeof(data.webp) == 'boolean') {
     let basicpath = `/appdata/images/public/${data.id}/`
     fs.readdir('.' + basicpath, (err, ImageFiles) => {
 
@@ -279,5 +279,8 @@ x.sendimg = (data) => {
         SetQuality()
       }
     })
+  } else {
+    // if the input data is wrong end the request so the server can go to the next one
+    data.res.end()
   }
 }

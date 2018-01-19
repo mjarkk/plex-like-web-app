@@ -11,6 +11,7 @@ const pbkdf2 = require('pbkdf2-sha256')
 const randomstring = require('randomstring')
 const sha1File = require('sha1-file')
 const questions = require('questions')
+const path = require('path')
 
 const check = require('./check.js')
 const globvars = {
@@ -56,7 +57,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
   // start checking/creating of the tables this function needs a array with all the tabel names
-  ensuredb(['users','images','checkencryption'])
+  ensuredb(['users','images','videos','checkencryption'])
 
   // check if all the data is made to start the server
   x.check = (callback) => setTimeout(() => {
@@ -133,6 +134,28 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
   //   }
   // }
   x.CreateVideoProviel = (data, callback) => {
+    let todb = Object.assign(
+      {},{
+        id: data.dir.substring(data.dir.length,data.dir.length-40), // the sha of the movie
+        moviename: path.parse(data.original).name, // the name of the movie
+        background: '', // a background image for the movie info screen
+        belongs: { // this object contains all info if the movie is relavant to a serie or title
+          name: '',
+          poster: ''
+        }, // a name of a serie
+        show: true // show the movie on the website
+      },data
+    )
+    let createproviel = () => {
+      // insert data into database
+      db.collection('videos').insertOne(todb, (err, res) => {
+        if (err) {
+          Call({status: false})
+        } else {
+          Call({status: true})
+        }
+      })
+    }
     let Call = (data) =>
       (typeof callback == 'function') ?
         callback(data) :
@@ -141,7 +164,8 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
       typeof data.original == 'string' &&
       typeof data.dir == 'string' &&
       typeof data.files == 'object' &&
-      typeof data.files.poster == 'object' &&
+      typeof data.files.preview == 'boolean' &&
+      typeof data.files.poster == 'boolean' &&
       typeof data.files.mpd == 'boolean' &&
       typeof data.files.shakaCreated == 'boolean' &&
       typeof data.files.shakaVideo == 'boolean' &&
@@ -153,17 +177,65 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
       typeof data.files.shakaVideo720 == 'boolean' &&
       typeof data.files.shakaAudio720 == 'boolean'
     ) {
-      // video is file
-      Call({status: true})
+      // data object is valid
+      db.collection('videos').find({dir: data.dir}).toArray((err, result) => {
+        if (err || !result[0]) {
+          // no video proviel does exsist of this folder
+          createproviel()
+        } else {
+          // video proviel already exsist
+          Call({status: true})
+        }
+      })
     } else {
       Call({status: false})
     }
   }
 
+  // get a list of all video files
+  // data = {
+  //   req: req, <object (from a express.js post message)>
+  //   res: res <object (from a express.js post message)>
+  // }
+  x.getvideolist = (data, callback) => {
+    if (data && typeof callback == 'function' && data.req && data.res) {
+      db.collection('videos')
+      .find()
+      .toArray((err, result) => {
+        let tosend = []
+        for (var i = 0; i < result.length; i++) {
+          let re = result[i]
+          let topush = []
+          topush.push(re.id)
+          topush.push(re.moviename)
+          topush.push((re.show && re.files.shakaVideo && re.files.shakaAudio && re.files.mpd))
+          topush.push(re.files.poster)
+          topush.push(re.background)
+          topush.push(re.belongs.name)
+          topush.push(re.belongs.poster)
+          tosend.push(topush)
+
+        }
+        // tosend = [
+        //   < id >,
+        //   < movie name >,
+        //   < show movie >,
+        //   < movie poster >,
+        //   < movie background image >,
+        //   < name of relavate serie or something else >,
+        //   < poster of relevate serie or something else >
+        // ]
+        callback(tosend)
+      })
+    } else {
+      callback(nope)
+    }
+  }
+
   // get a list of images
   // data = {
-  //   req: req,
-  //   res: res,
+  //   req: req, <object (from a express.js post message)>
+  //   res: res, <object (from a express.js post message)>
   //   index: <string OR number>
   //   amound: <number>
   // }

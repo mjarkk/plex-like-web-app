@@ -116,7 +116,7 @@ let filesloop = (i) => {
               original: fc,
               dir: dir,
               files: {
-                preview: (!fe('preview/t-1.jpg') || !fe('preview/t-01.jpg') || !fe('preview/t-001.jpg') || !fe('preview/t-0001.jpg') || !fe('preview/t-00001.jpg')),
+                preview: !!(!fe('preview/t-1.jpg') || !fe('preview/t-01.jpg') || !fe('preview/t-001.jpg') || !fe('preview/t-0001.jpg') || !fe('preview/t-00001.jpg')),
                 mpd: fe('video.mpd'),
                 poster: fe('poster.png'),
                 shakaCreated: fe('shakacreated.dune'),
@@ -130,7 +130,6 @@ let filesloop = (i) => {
                 shakaAudio720: fe('shaka-movie720_audio.mp4')
               }
             }, (dbOutput) => {
-              // log(dbOutput)
               next()
             })
           }

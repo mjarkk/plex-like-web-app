@@ -52,11 +52,30 @@ var home = new Vue({
       loadedBasic: false,
       images: [],
       imagesindexes: {}
+    },
+    movies: {
+      list: []
     }
   },
   methods: {
     fetchMovieList: () => {
-      // load movie list
+      // fetch the movie list
+      fetch(`/videoindex/`, {method: 'post',credentials: 'same-origin'})
+      .then(res => res.json())
+      .then(jsondata => {
+        WebWorker.postMessage({
+          what: 'decryptjson',
+          key: localStorage.getItem('key'),
+          todecrypt: jsondata.data,
+          sideload: 'getbasicvideos'
+        })
+      })
+      .catch((e) => true)
+    },
+    createVideoList: (data) => {
+      // this fuction is used to handele the belongs object inside data
+      home.movies.list = data
+      log(data)
     },
     openimg: (image) => reqfile('imgviewer', () => {
       // open image
@@ -328,5 +347,23 @@ WebWorker.addEventListener('message', (msg) => {
     }
     home.ImgPreMake(imagesLenght)
     home.LoadImages(imagesLenght)
+  } else if (data.what == 'getbasicvideos') {
+    let touse = []
+    for (var i = 0; i < data.data.length; i++) {
+      // transform the array with data to something that's readable
+      let d = data.data[i]
+      touse.push({
+        id: d[0],
+        moviename: d[1],
+        show: d[2],
+        poster: d[3],
+        background: d[4],
+        belongs: {
+          name: d[5],
+          poster: d[6]
+        }
+      })
+    }
+    home.createVideoList(touse)
   }
 })
