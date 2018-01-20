@@ -9,12 +9,26 @@ if (!WebWorker || typeof(Storage) == "undefined") {
 
 reqfile = (required, callback) => {
   let r = required
+  let checkRequiredArray = () => {
+    let checkarr = r.split('.')
+    let returnval = true
+    for (var i = 0; i < checkarr.length; i++) {
+      (!window.LoadedScripts[checkarr[i]]) ?
+        returnval = false :
+        true
+    }
+    return returnval
+  }
   if (typeof(r) == 'string') {
-    if (window.LoadedScripts[r]) {
+    if (checkRequiredArray()) {
       callback()
     } else {
       let s = document.createElement('script')
-      s.src = `/js/${ encodeURIComponent(required.replace('/','').replace('http','').replace('..','').replace('%2F','')) }.js`
+      if (r.indexOf('.') !== -1) {
+        s.src = `/--${r}--/basic.js`
+      } else {
+        s.src = `/js/${ encodeURIComponent(r.replace('/','').replace('http','').replace('..','').replace('%2F','')) }.js`
+      }
       document.body.append(s)
       s.onload = () => {
         callback()

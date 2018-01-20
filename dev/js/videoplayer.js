@@ -1,43 +1,58 @@
 // the videoplayer file
-
 window.LoadedScripts['videoplayer'] = true
 
-
-var manifestUri = '/video/MPD/videoid/mpd';
-
 let initApp = () => {
-  shaka.polyfill.installAll();
+  shaka.polyfill.installAll()
   if (shaka.Player.isBrowserSupported()) {
-    initPlayer();
+    moviePlayer.shakaloaded = true
   } else {
-    // This browser does not have the minimum set of APIs we need.
-    console.error('Browser not supported!');
+    log('Browser not supported!')
   }
 }
 
-let initPlayer = () => {
-  // Create a Player instance.
-  var video = document.getElementById('video')
-  var player = new shaka.Player(video)
+var moviePlayer = new Vue({
+  el: '.videoplayer-vue',
+  data: {
+    player: {},
+    shakaloaded: false,
+    movie: {
+      id: '',
+      mpd: ''
+    }
+  },
+  methods: {
+    loadvideo: (movieID) => {
+      moviePlayer.movie.id = movieID
+    },
+    initPlayer: () => {
+      var video = document.querySelector('#videoplayer-shaka')
+      moviePlayer.player = new shaka.Player(video)
+      moviePlayer.player.addEventListener('error', onErrorEvent)
+      moviePlayer.player.load(moviePlayer.movie.mpd).then(() => {
+        log('The video has now been loaded!')
+      }).catch(onError)
+    }
+  },
+  watch: {
+    'movie.id': (newval) => {
+      moviePlayer.movie.mpd = `/video/MPD/${newval}/mpd`
+      if (moviePlayer.shakaloaded) {
+        moviePlayer.initPlayer()
+      }
+    }
+  },
+  created: () => setTimeout( () => {
 
-  // Attach player to the window to make it easy to access in the JS console.
-  window.player = player
+  }, 1)
+})
 
-  player.addEventListener('error', onErrorEvent)
-
-  // Try to load a manifest.
-  // This is an asynchronous process.
-  player.load(manifestUri).then(() => {
-    console.log('The video has now been loaded!');
-  }).catch(onError)
-}
 
 onErrorEvent = (event) => {
-  onError(event.detail);
+  onError(event.detail)
 }
 
 onError = (error) => {
-  console.error('Error code', error.code, 'object', error);
+  log('Error code', error.code, 'object', error)
 }
 
-document.addEventListener('DOMContentLoaded', initApp)
+initApp()

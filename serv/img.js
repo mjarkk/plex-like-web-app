@@ -281,6 +281,62 @@ x.sendimg = (data) => {
     })
   } else {
     // if the input data is wrong end the request so the server can go to the next one
-    data.res.end()
+    if (data && data.res) {
+      data.res.end()
+    }
+  }
+}
+
+// send a spesific image to the user
+// data = {
+//   imgpath: <string (location of the image)>,
+//   quality: <number (from 100 to 0 don't have to include this)>,
+//   size: { <object (don't have to include this)>
+//     height: <number>
+//     width: <number>
+//   }
+//   req: req, <object (from a express.js post message)>
+//   res: res, <object (from a express.js post message)>
+// }
+x.SendImgPath = (data) => {
+  if (data && data.res && data.req && typeof data.imgpath == 'string' && fs.existsSync(data.imgpath)) {
+    let res = data.res
+
+    let SendImg = (buffer) => {
+      res.set('Content-Type', 'image/' + path.extname(data.imgpath).replace('.',''))
+      if (buffer) {
+        // send a image buffer to the user from the eddited image
+        res.send(buffer)
+      } else {
+        res.sendFile(data.imgpath)
+      }
+    }
+
+    sharp(data.imgpath)
+    .resize(
+      (data.size && data.size.width) ?
+        data.size.width :
+        null,
+      (data.size && data.size.height) ?
+        data.size.height :
+        null
+    )
+    .withMetadata()
+    .jpeg({
+      quality : (typeof data.quality == 'number' && data.quality >= 1  && data.quality <= 100) ?
+        data.quality : // if the quality is include with the data object set the quality
+        100 // if not set the quality to 100%
+      ,
+      force : false
+    })
+    .toBuffer()
+    .then( data => SendImg(data) )
+    .catch( err => SendImg())
+
+  } else {
+    if (data && data.res) {
+      // if the input data is wrong end the request so the server can go to the next one
+      data.res.end()
+    }
   }
 }

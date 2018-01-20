@@ -11,6 +11,7 @@ const fileinfo = require('fileinfo')
 const path = require('path')
 const shell = require('shelljs')
 const os = require('os')
+const img = require('./img.js')
 
 // the basic ffmpeg input
 const ffmpegAdd = (toadd) => `ffmpeg -v quiet -stats ${(typeof toadd == 'string') ? `${toadd} ` : ''}-y -i`
@@ -205,7 +206,7 @@ let compile = (videofile, callback) => {
             } else {
               // create a mp4 copy of the file
               log(`Creating full mp4 file`)
-              exec(`${ffmpeg} ${ltf(input)} -codec copy ${ltf(nextinput)}`, () => next())
+              exec(`${ffmpeg} ${ltf(input)} ${ltf(nextinput)}`, () => next()) // can't recompile the video fast because some video's have MPEG2-TS what issn't supported by a lot of browsers
             }
           } else {
             log('input file does not exsist')
@@ -306,7 +307,7 @@ let compile = (videofile, callback) => {
           `${checkp(`movie360.mp4`) ? `input=${dir}movie360.mp4,stream=video,output=${dir}shaka-movie360_video.mp4 ` : '' }`+ // the 360p video
           `--profile on-demand ` + // got this command from the internet don't know what is does
           `--mpd_output ${dir}video.mpd ` + // the mpd file to inform the shaka player
-          `--min_buffer_time 4 ` + // a minimum buffer time of 4 i have dune this because this will meybe be ran on slow server that can't handele to much at the same time
+          `--min_buffer_time 4 ` + // a minimum buffer time of 4 i have dune this because this will maybe be ran on slow server that can't handele to much at the same time
           `--segment_duration 4` // the segment duration
           if (checkp(`shakacreated.dune`) && checkp('shaka-movie_audio.mp4') && checkp('shaka-movie_video.mp4')) {
             // shaka files already exsist go to the next steps
@@ -324,13 +325,17 @@ let compile = (videofile, callback) => {
         let cleanup = (input, callback) => {
           // this will cleanup all files that are useless and will only take up space
           let removefiles = ['movie.mp4','movie720.mp4','movie540.mp4','movie360.mp4']
+          let checkshakafiles = ['shaka-movie_video.mp4','shaka-movie720_video.mp4','shaka-movie540_video.mp4','shaka-movie360_video.mp4']
+          if (true) {
+
+          }
           let removefile = (index) => {
             let toRemove = removefiles[index]
             if (toRemove) {
               let next = () => removefile(index + 1)
-              toRemove = input + toRemove
-              if (fs.existsSync(toRemove)) {
-                fs.remove(toRemove, err => {
+              let newtoRemove = input + toRemove
+              if (fs.existsSync(newtoRemove) && fs.existsSync(presolve(checkshakafiles[index]))) {
+                fs.remove(newtoRemove, err => {
                   next()
                 })
               } else {
@@ -345,10 +350,11 @@ let compile = (videofile, callback) => {
           removefile(0)
         }
         if (
-          !path.resolve(__dirname, '..', videodir, 'shaka-movie_video.mp4') &&
-          !path.resolve(__dirname, '..', videodir, 'shaka-movie_audio.mp4') &&
-          !path.resolve(__dirname, '..', videodir, 'shakacreated.dune') &&
-          !path.resolve(__dirname, '..', videodir, 'video.mpd')) {
+          !fs.existsSync(path.resolve(__dirname, '..', videodir, 'shaka-movie_video.mp4')) &&
+          !fs.existsSync(path.resolve(__dirname, '..', videodir, 'shaka-movie_audio.mp4')) &&
+          !fs.existsSync(path.resolve(__dirname, '..', videodir, 'shakacreated.dune')) &&
+          !fs.existsSync(path.resolve(__dirname, '..', videodir, 'video.mpd'))
+        ) {
           MakeMP4(videofile, callback)
         } else {
           callback({status: true})
@@ -359,3 +365,30 @@ let compile = (videofile, callback) => {
 }
 
 dirloop(0)
+
+// send video poster to the user
+// input = {
+//   req: req, <object (from a express.js post message)>
+//   res: res, <object (from a express.js post message)>
+//   id: <string (the sha1 of the specifice movie)>
+// }
+x.SendVideoPoster = (input) => {
+  if (input && input.req && input.res && typeof input.id == 'string' && !input.id.includes('/') && !input.id.includes('\\') && !input.id.includes('..')) {
+    let posterlocation = path.resolve(__dirname, `..`, `appdata/movies/public/${input.id}/poster.png`)
+    img.SendImgPath({
+      imgpath: posterlocation,
+      quality: 70,
+      size: {
+        height: 200,
+        width: 200
+      },
+      req: input.req,
+      res: input.res,
+    })
+  } else {
+    if (input && input.res) {
+      // if input is invalid end the reqest
+      input.res.end()
+    }
+  }
+}

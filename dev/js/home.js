@@ -77,6 +77,12 @@ var home = new Vue({
       home.movies.list = data
       log(data)
     },
+    openmovie: (movie) => {
+      document.querySelector('.videoplayer-vue').style.display = 'block'
+      reqfile('shaka-player-compiled-debug.videoplayer', () => {
+        moviePlayer.loadvideo(movie)
+      })
+    },
     openimg: (image) => reqfile('imgviewer', () => {
       // open image
       document.querySelector('.img-viewer-vue').style.display = 'block'

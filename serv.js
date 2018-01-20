@@ -96,6 +96,17 @@ app.post('/videoindex/', (req, res) => {
   }))
 })
 
+// route for movie images
+app.get('/movieposter/:id', (req,res) => {
+  let tosend = {
+    req: req,
+    res: res,
+    type: 'text',
+    id: req.params.id
+  }
+  dba.checkuser(tosend, (UserData) => video.SendVideoPoster(tosend))
+})
+
 // get a index of all images to request
 app.post('/imageindex/:index/:amound', (req, res) => {
   let tosend = {

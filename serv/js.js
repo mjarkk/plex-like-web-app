@@ -20,6 +20,11 @@ fs.copy(vuefile, './www/js/vue.js', () => {
   log(`copied vue.js file`)
 })
 
+let muxfile = (globconf.dev) ? './node_modules/mux.js/dist/mux.js' : './node_modules/mux.js/dist/mux.min.js'
+fs.copy(muxfile, './www/js/mux.js', () => {
+  log(`copied vue.js file`)
+})
+
 let comiple = (name) => {
   let to = name.replace('dev/','www/').replace('dev\\','www\\')
   if (globconf.dev) {
