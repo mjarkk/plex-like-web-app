@@ -14,8 +14,8 @@
     <div class="app-content app-content-videos" v-if="activeapp == 'movies'">
       <div class="all">
         <div class="movie-item" v-for="movie in movies.list" v-on:click="openmovie(movie.id)">
-          <div class="poster" >
-            <!-- v-bind:style="{'background-image': `url(${(movie.poster) ? `/movieposter/${movie.id}` : `/movieposter/basic`})`}" -->
+          <div class="poster" v-bind:style="{'background-image': `url(${(movie.poster) ? `/movieposter/${movie.id}` : `/movieposter/basic`})`}">
+            
           </div>
           <div class="inf">
             <h3>{{ movie.moviename.replace(/\./g,' ') }}</h3>
