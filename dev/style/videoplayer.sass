@@ -12,3 +12,53 @@
   height: 100vh
   width: 100vw
   background-color: black
+  #videoplayer-shaka
+    width: 100vw
+    height: 100vh
+  .video-controls, .cast, .volume .icon
+    display: flex
+    justify-content: flex-start
+    align-items: center
+    position: fixed
+    bottom: 0px
+    left: 0px
+    background-color: white
+    height: 60px
+    width: 100vw
+    .playpause
+      height: 60px
+      width: 60px
+      .vid-btn
+        height: 100%
+        width: 100%
+        display: flex
+        justify-content: center
+        align-items: center
+        cursor: pointer
+        svg
+          height: 40px
+          width: 40px
+  .slider
+    width: 100%
+    height: 60px
+    display: flex
+    justify-content: center
+    align-items: center
+    .holder
+      width: 92%
+      height: 10px
+      border-radius: 5px
+      box-sizing: border-box
+      border: 2px solid black
+      .process
+        max-width: 20px
+        max-height: 20px
+        min-width: 20px
+        min-height: 20px
+        position: relative
+        top: -7px
+        left: -8px
+        background-color: black
+        border-radius: 100%
+        .preview
+          .inside

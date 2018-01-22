@@ -14,6 +14,9 @@ var moviePlayer = new Vue({
   el: '.videoplayer-vue',
   data: {
     player: {},
+    control: {
+      paused: false
+    },
     shakaloaded: false,
     movie: {
       id: '',
@@ -21,6 +24,38 @@ var moviePlayer = new Vue({
     }
   },
   methods: {
+    timelineclick: (ev) => {
+      let progressBar = document.querySelector('.slider .holder')
+      let newpos = 100 / progressBar.offsetWidth * (ev.pageX - progressBar.offsetLeft)
+      let videl = document.querySelector('#videoplayer-shaka')
+      let ispaused = videl.paused
+      if (!ispaused) {
+        videl.pause()
+      }
+      videl.currentTime = videl.duration / 100 * newpos
+      if (!ispaused) {
+        videl.play()
+      }
+    },
+    updatetimeline: () => {
+      let videl = document.querySelector('#videoplayer-shaka')
+      let pos = 100 / videl.duration * videl.currentTime
+      let progressBar = document.querySelector('.slider .holder')
+      let PBW = progressBar.offsetWidth // pbw = progess bar width
+      progressBar.querySelector('.process').style.left = ((PBW / 100 * pos) - 8) + 'px'
+    },
+    play: () => {
+      document.querySelector('#videoplayer-shaka').play()
+      moviePlayer.update()
+    },
+    pause: () => {
+      document.querySelector('#videoplayer-shaka').pause()
+      moviePlayer.update()
+    },
+    update: () => {
+      let vidplayer = document.querySelector('#videoplayer-shaka')
+      moviePlayer.control.paused = vidplayer.paused
+    },
     loadvideo: (movieID) => {
       moviePlayer.movie.id = movieID
     },
@@ -29,8 +64,11 @@ var moviePlayer = new Vue({
       moviePlayer.player = new shaka.Player(video)
       moviePlayer.player.addEventListener('error', onErrorEvent)
       moviePlayer.player.load(moviePlayer.movie.mpd).then(() => {
-        log('The video has now been loaded!')
+        setTimeout(() => {
+          moviePlayer.update()
+        }, 100)
       }).catch(onError)
+      video.ontimeupdate = (e) => moviePlayer.updatetimeline()
     }
   },
   watch: {
