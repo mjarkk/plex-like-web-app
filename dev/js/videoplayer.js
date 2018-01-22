@@ -17,6 +17,8 @@ var moviePlayer = new Vue({
     control: {
       paused: false
     },
+    volume: 1,
+    volumesliding: false,
     shakaloaded: false,
     movie: {
       id: '',
@@ -24,6 +26,28 @@ var moviePlayer = new Vue({
     }
   },
   methods: {
+    movevolume: (ev) => {
+      if (moviePlayer.volumesliding) {
+        let element = document.querySelector('.volume-slider')
+        let newpos = Math.floor(100 / 115 * (ev.pageX - element.offsetLeft - 9)) / 100
+        if (newpos < 0.05) {
+          newpos = 0
+        } else if (newpos > 1) {
+          newpos = 1
+        }
+        let videl = document.querySelector('#videoplayer-shaka')
+        moviePlayer.volume = newpos
+        videl.volume = newpos
+        element.querySelector('.button').style.left = ((110 / 1 * newpos) - 8) + 'px'
+      }
+    },
+    volumereleaseclick: (ev) => {
+      moviePlayer.volumesliding = false
+    },
+    volumeclick: (ev) => {
+      moviePlayer.volumesliding = true
+      moviePlayer.movevolume(ev)
+    },
     timelineclick: (ev) => {
       let progressBar = document.querySelector('.slider .holder')
       let newpos = 100 / progressBar.offsetWidth * (ev.pageX - progressBar.offsetLeft)
