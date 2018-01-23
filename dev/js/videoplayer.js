@@ -21,11 +21,61 @@ var moviePlayer = new Vue({
     volumesliding: false,
     shakaloaded: false,
     movie: {
+      name: '',
+      poster: false,
       id: '',
       mpd: ''
     }
   },
   methods: {
+    keydown: (ev) => {
+      if (document.querySelector('.videoplayer-vue').style.display == 'block') {
+        let videl = document.querySelector('#videoplayer-shaka')
+        let key = ev.keyCode
+        let ispaused = videl.paused
+        if (key == 32) {
+          // space key
+          if (!ispaused) {
+            videl.pause()
+          } else {
+            videl.play()
+          }
+        } else if (key == 8) {
+          // backspace key
+
+        } else if (key == 37 || key == 39) {
+          // go back 10 seconds or skip 10 seconds
+          if (!ispaused) {
+            videl.pause()
+          }
+          if (key == 37) {
+            // go back
+            let newtime = videl.currentTime - 10
+            if (newtime > 0) {
+              videl.currentTime = newtime
+            } else {
+              videl.currentTime = 0
+            }
+          } else {
+            // skip
+            let newtime = videl.currentTime + 10
+            if (videl.duration > newtime) {
+              videl.currentTime = newtime
+            } else {
+              videl.currentTime = videl.duration - 1
+            }
+          }
+          if (!ispaused) {
+            videl.play()
+          }
+        }
+        moviePlayer.update()
+      }
+    },
+    closeplayer: () => {
+      document.querySelector('.videoplayer-vue').style.display = 'none'
+      document.querySelector('#videoplayer-shaka').pause()
+    },
     movevolume: (ev) => {
       if (moviePlayer.volumesliding) {
         let element = document.querySelector('.volume-slider')
@@ -80,8 +130,10 @@ var moviePlayer = new Vue({
       let vidplayer = document.querySelector('#videoplayer-shaka')
       moviePlayer.control.paused = vidplayer.paused
     },
-    loadvideo: (movieID) => {
-      moviePlayer.movie.id = movieID
+    loadvideo: (movie) => {
+      moviePlayer.movie.name = movie.moviename
+      moviePlayer.movie.poster = movie.poster
+      moviePlayer.movie.id = movie.id
     },
     initPlayer: () => {
       var video = document.querySelector('#videoplayer-shaka')
@@ -93,6 +145,7 @@ var moviePlayer = new Vue({
         }, 100)
       }).catch(onError)
       video.ontimeupdate = (e) => moviePlayer.updatetimeline()
+      document.querySelector('body').addEventListener('keydown', moviePlayer.keydown)
     }
   },
   watch: {
@@ -100,6 +153,12 @@ var moviePlayer = new Vue({
       moviePlayer.movie.mpd = `/video/MPD/${newval}/mpd`
       if (moviePlayer.shakaloaded) {
         moviePlayer.initPlayer()
+      } else {
+        moviePlayer.player.load(moviePlayer.movie.mpd).then(() => {
+          setTimeout(() => {
+            moviePlayer.update()
+          }, 100)
+        }).catch(onError)
       }
     }
   },
