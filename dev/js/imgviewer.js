@@ -12,7 +12,8 @@ var imgviewer = new Vue({
     layer2: '', // this layer includes a full res image but not the best quality
     layer3: '', // this layer has the full resolution and quality
     showlayer: [false,false,false],
-    layer1size: 200
+    layer1size: 200,
+    lasturl: ''
   },
   methods: {
     closeimgviewer: () => {
@@ -21,6 +22,10 @@ var imgviewer = new Vue({
       imgviewer.layer2 = ''
       imgviewer.layer3 = ''
       imgviewer.showlayer = [false,false,false]
+      // load the old url
+      if (imgviewer.show != 'none') {
+        UrlHandeler.changePath(imgviewer.lasturl)
+      }
     },
     showimg: (data) => {
       // data = {
@@ -82,6 +87,8 @@ var imgviewer = new Vue({
       } else {
         showerr(data.id ? 'NO IMAGE ID DEFINED' : 'NO ASPECT DEFINED')
       }
+      imgviewer.lasturl = (!location.pathname.startsWith('/img/')) ? location.pathname : (imgviewer.lasturl) ? imgviewer.lasturl : '/'
+      UrlHandeler.changePath(`img/${data.id}`)
     }
   },
   watch: {},

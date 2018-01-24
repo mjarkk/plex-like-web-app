@@ -13,6 +13,7 @@ let initApp = () => {
 var moviePlayer = new Vue({
   el: '.videoplayer-vue',
   data: {
+    lasturl: '',
     player: {},
     control: {
       paused: false
@@ -75,8 +76,12 @@ var moviePlayer = new Vue({
       }
     },
     closeplayer: () => {
-      document.querySelector('.videoplayer-vue').style.display = 'none'
+      let mainel = document.querySelector('.videoplayer-vue')
+      mainel.style.display = 'none'
       document.querySelector('#videoplayer-shaka').pause()
+      if (mainel.style.display != 'none') {
+        UrlHandeler.changePath(moviePlayer.lasturl)
+      }
       moviePlayer.player = {}
     },
     movevolume: (ev) => {
@@ -139,6 +144,8 @@ var moviePlayer = new Vue({
       moviePlayer.movie.name = movie.moviename
       moviePlayer.movie.poster = movie.poster
       moviePlayer.movie.id = movie.id
+      moviePlayer.lasturl = (!location.pathname.startsWith('/movie/')) ? location.pathname : (moviePlayer.lasturl) ? moviePlayer.lasturl : '/'
+      UrlHandeler.changePath(`/movie/${movie.id}`)
     },
     initPlayer: () => {
       var video = document.querySelector('#videoplayer-shaka')

@@ -70,15 +70,66 @@ class urlhandeler {
   constructor() {
     window.addEventListener('popstate', (ev) => {
       // check if the user changes the url
+      let newPath = location.pathname
       if (!location.href.includes('#')) {
-        log(location.href)
+        this.GoTo(newPath)
       }
     })
   }
+  CloseMoviePlayer() {
+    if (typeof moviePlayer != 'undefined') {
+      moviePlayer.closeplayer()
+    } else {
+      document.querySelector('.videoplayer-vue').style.display = 'none'
+    }
+  }
+  CloseImgViewer() {
+    if (typeof imgviewer != 'undefined') {
+      imgviewer.closeimgviewer()
+    } else {
+      document.querySelector('.img-viewer-vue').style.display = 'none'
+    }
+  }
+  GoTo(to) {
+    if (to == '/') {
+      home.activeapp = 'home'
+    } else if (to == '/home' || to == '/movies' || to == '/settings' || to == '/music' || to == '/images') {
+      // load the movie view
+      home.activeapp = to.replace('/','')
+      this.CloseImgViewer()
+      this.CloseMoviePlayer()
+    } else if (to.startsWith('/img/')) {
+      // load the image view if the image is in home.images.images
+      let testArray = home.images.images
+      let id = to.replace('/img/','')
+      for (var i = 0; i < testArray.length; i++) {
+        if (testArray[i].id == id) {
+          reqfile('imgviewer', () => {
+            document.querySelector('.img-viewer-vue').style.display = 'block'
+            imgviewer.showimg({
+              aspect: testArray[i].aspect,
+              id: testArray[i].id,
+              previewurl: testArray[i].url
+            })
+          })
+          break;
+        }
+      }
+    }
+    log('go to:', to)
+  }
   changePath(newpath) {
-    location.hash = newpath
+    // check if the input url starts with a /
+    newpath = (newpath[0] == '/') ? newpath : `/${newpath}`
+    // because the browser doesn't fire the popstate and location.hash event when...
+    // only useing history.pushState or history.replaceState it needs to use this hack that will work
+    // first the browser sets the location.hash of the page to the new location
+    location.hash = newpath.replace(/\//g,'') // replace all "/" with '' because it breaks a url
+    // than the browser update the path with the write one
     history.replaceState(null, null, newpath)
-    // history.replaceState(null, null, newpath)
+    // now when it changes the popstate reacts it reacts with the location.hash url what...
+    // it can easialy filter out because we don't want to do things dubble
+    // but when the user clickes the back or forward button the popstate sees the actual url not the location.hash url
   }
 }
 
