@@ -54,10 +54,33 @@ var home = new Vue({
       imagesindexes: {}
     },
     movies: {
-      list: []
+      list: [],
+      ShowMoreInfo: false,
+      selectedID: 0,
+      selectedEdit: false,
+      selected: {
+        background: '',
+        belongs: {
+          name: '',
+          poster: ''
+        },
+        id: '30dc0050ba21d0ffe3743619c51181506c5ccda0',
+        moviename: 'Mr.Robot.S03E09.720p.HDTV.x264-AVS',
+        poster: true,
+        show: true,
+      }
     }
   },
   methods: {
+    openmoreinfo: (movie) => {
+      home.movies.ShowMoreInfo = true
+      home.movies.selected = movie
+    },
+    closeVideoPopup: (ev) => {
+      if (ev.srcElement.classList[0] == 'video-popup') {
+        home.movies.ShowMoreInfo = false
+      }
+    },
     fetchMovieList: () => {
       // fetch the movie list
       fetch(`/videoindex/`, {method: 'post',credentials: 'same-origin'})
@@ -82,6 +105,7 @@ var home = new Vue({
       reqfile('shaka-player-compiled-debug.videoplayer', () => {
         moviePlayer.loadvideo(movie)
       })
+      home.movies.ShowMoreInfo = false
     },
     openimg: (image) => reqfile('imgviewer', () => {
       // open image

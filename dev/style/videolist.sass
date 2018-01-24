@@ -25,3 +25,86 @@
         background-size: cover
       .inf
         h3
+.video-popup
+  position: fixed
+  top: 0px
+  left: 0px
+  height: 100vh
+  width: 100vw
+  display: flex
+  justify-content: center
+  align-items: center
+  .inside
+    height: 500px
+    width: 600px
+    background-color: white
+    box-sizing: border-box
+    border-radius: 10px
+    overflow: hidden
+    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22)
+    display: flex
+    .generalinf
+      width: 50%
+      height: 100%
+      .titleimg
+        height: 50%
+        width: 100%
+        display: flex
+        justify-content: center
+        align-items: center
+        .poster
+          height: 180px
+          width: 180px
+          border-radius: 10px
+          overflow: hidden
+          background-position: center
+          background-repeat: no-repeat
+          background-size: cover
+          display: flex
+          justify-content: center
+          align-items: center
+          cursor: pointer
+          svg
+            opacity: 0.3
+            transition: opacity 0.3s
+            height: 60px
+            width: 60px
+            cursor: pointer
+          &:hover svg
+            opacity: 1
+    .otherinf
+      width: 50%
+      height: 100%
+      border-left: 2px solid #eee
+      .buttons
+        height: 40px
+        border-bottom: 2px solid #eee
+        display: flex
+        justify-content: flex-start
+        align-items: center
+        svg
+          cursor: pointer
+          height: 30px
+          width: 30px
+          padding: 5px
+      div
+        .inf
+          margin: 5px
+          font-size: 18px
+          font-weight: 600
+        .b-content, input
+          height: 30px
+          max-height: 50px
+          white-space: pre
+          width: 100%
+          display: flex
+          align-items: center
+          padding: 5px
+          font-size: 20px
+          overflow: hidden
+          box-sizing: border-box
+          margin: 5px 0px
+        .b-content
+          border-bottom: 2px solid white
+        input
+          border-bottom: 2px solid #71189d

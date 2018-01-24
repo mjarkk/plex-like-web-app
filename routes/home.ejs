@@ -11,9 +11,50 @@
     <div class="header2">
       <h1>{{ activeapp.capitalize() }}</h1>
     </div>
+
+    <!-- movies -->
     <div class="app-content app-content-videos" v-if="activeapp == 'movies'">
+      <div class="video-popup" v-if="movies.ShowMoreInfo" v-on:click="closeVideoPopup">
+        <div class="inside">
+          <div class="generalinf">
+            <div class="titleimg">
+              <div class="poster" v-on:click="openmovie(movies.selected)" v-bind:style="{'background-image': `url(${(movies.selected.poster) ? `/movieposter/${movies.selected.id}` : `/movieposter/basic`})`}">
+                <svg fill="#ffffff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="otherinf">
+            <div class="buttons">
+              <svg class="settings-btn" v-on:click="movies.selectedEdit = true" v-if="movies.selectedEdit == false" fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                <path d="M0 0h24v24H0z" fill="none"/>
+              </svg>
+              <svg class="settings-btn" v-on:click="movies.selectedEdit = false" v-if="movies.selectedEdit == true" fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+              </svg>
+            </div>
+            <div class="info">
+              <div class="title">
+                <p class="inf">Movie name:</p>
+                <p v-if="!movies.selectedEdit" class="b-content">{{ movies.selected.moviename.replace(/\./g,' ') }}</p>
+                <input v-if="movies.selectedEdit" type="text" v-model="movies.selected.moviename">
+              </div>
+              <div class="belongsto">
+                <p class="inf">Belongs to serie</p>
+                <p class="b-content" v-if="movies.selected.belongs.name && !movies.selectedEdit">{{ movies.selected.belongs.name }}</p>
+                <p class="b-content" v-if="!movies.selected.belongs.name && !movies.selectedEdit">---</p>
+                <input v-if="movies.selectedEdit" type="text" v-model="movies.selected.belongs.name">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="all">
-        <div class="movie-item" v-for="movie in movies.list" v-on:click="openmovie(movie)">
+        <div class="movie-item" v-for="movie in movies.list" v-on:click="openmoreinfo(movie)">
           <div class="poster" v-bind:style="{'background-image': `url(${(movie.poster) ? `/movieposter/${movie.id}` : `/movieposter/basic`})`}">
 
           </div>
@@ -23,6 +64,8 @@
         </div>
       </div>
     </div>
+
+    <!-- images -->
     <div class="app-content app-content-images" v-if="activeapp == 'images'">
       <div class="recentimgs">
         <h2>RECENT</h2>
@@ -46,8 +89,9 @@
         </div>
       </div>
     </div>
+
+    <!-- settings -->
     <div class="app-content" v-if="activeapp == 'settings' && settingsloaded">
-      <!-- settings -->
       <h2>Server</h2>
       <div class="row">
         <p>Port</p>
@@ -95,5 +139,6 @@
       </div>
       <h2>Client</h2>
     </div>
+
   </div>
 </div>

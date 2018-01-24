@@ -35,6 +35,7 @@ var moviePlayer = new Vue({
         let ispaused = videl.paused
         if (key == 32) {
           // space key
+          // play / pause the player
           if (!ispaused) {
             videl.pause()
           } else {
@@ -42,9 +43,10 @@ var moviePlayer = new Vue({
           }
         } else if (key == 8) {
           // backspace key
-
+          // close the player
+          moviePlayer.closeplayer()
         } else if (key == 37 || key == 39) {
-          // go back 10 seconds or skip 10 seconds
+          // go back 10 seconds or skip 10 seconds (the move cursor keys)
           if (!ispaused) {
             videl.pause()
           }
@@ -75,6 +77,7 @@ var moviePlayer = new Vue({
     closeplayer: () => {
       document.querySelector('.videoplayer-vue').style.display = 'none'
       document.querySelector('#videoplayer-shaka').pause()
+      moviePlayer.player = {}
     },
     movevolume: (ev) => {
       if (moviePlayer.volumesliding) {
@@ -127,8 +130,10 @@ var moviePlayer = new Vue({
       moviePlayer.update()
     },
     update: () => {
+      // update the values on screen
       let vidplayer = document.querySelector('#videoplayer-shaka')
       moviePlayer.control.paused = vidplayer.paused
+      document.querySelector('.volume-slider .button').style.left = '102px'
     },
     loadvideo: (movie) => {
       moviePlayer.movie.name = movie.moviename
@@ -151,15 +156,7 @@ var moviePlayer = new Vue({
   watch: {
     'movie.id': (newval) => {
       moviePlayer.movie.mpd = `/video/MPD/${newval}/mpd`
-      if (moviePlayer.shakaloaded) {
-        moviePlayer.initPlayer()
-      } else {
-        moviePlayer.player.load(moviePlayer.movie.mpd).then(() => {
-          setTimeout(() => {
-            moviePlayer.update()
-          }, 100)
-        }).catch(onError)
-      }
+      moviePlayer.initPlayer()
     }
   },
   created: () => setTimeout( () => {
