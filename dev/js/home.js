@@ -258,6 +258,7 @@ var home = new Vue({
   },
   watch: {
     activeapp: (newval, oldval) => {
+      UrlHandeler.changePath(newval)
       // load the right data for the view when it's clicked
       // also most of the work is pushed to a webworker for a smoother experiance
       // and the webworker has the cryptojs libary that it needs when requesting data from the server

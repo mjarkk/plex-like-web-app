@@ -63,7 +63,7 @@ Open in a text editor **conf/servconfig.json**
 - :heavy_check_mark: Movies viewer
 - :x: Home
 - :x: Music
-- :x: URL handler
+- :heavy_check_mark: URL handler
 - :x: Switch from a white to black color scheme inside settings
 - :x: Make tests to check if everyting works fine
 - :heavy_check_mark: Setup

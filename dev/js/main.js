@@ -1,5 +1,7 @@
 window.LoadedScripts['main'] = true
 
+// this file contains a lot of basic functions
+
 let DisplayFlex = (item) => document.querySelector(item).style.display = 'flex'
 
 // check for compatibility
@@ -43,7 +45,7 @@ reqfile = (required, callback) => {
 window.onload = () => {
   if (localStorage.getItem("key") && localStorage.getItem("username") && localStorage.getItem("PBKF2password")) {
     let page = currentpage
-    log(page)
+    log('startpage:',page)
     if (page == 'home') {
       DisplayFlex('.home-vue')
     } else if (page == 'login') {
@@ -58,6 +60,27 @@ window.onload = () => {
   }
 }
 
+// a function to capitalize a sense
 String.prototype.capitalize = function() {
   return this.charAt(0).toUpperCase() + this.slice(1);
 }
+
+// handele all the url's
+class urlhandeler {
+  constructor() {
+    window.addEventListener('popstate', (ev) => {
+      // check if the user changes the url
+      if (!location.href.includes('#')) {
+        log(location.href)
+      }
+    })
+  }
+  changePath(newpath) {
+    location.hash = newpath
+    history.replaceState(null, null, newpath)
+    // history.replaceState(null, null, newpath)
+  }
+}
+
+// create a url handeler and make it global so all the js files can make use of it
+let UrlHandeler = new urlhandeler()
