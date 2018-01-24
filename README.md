@@ -28,7 +28,8 @@ And it needs to be mobile friendly of course.
 - ```yarn start```
 
 ### Update
-- In a terminal type: ```yarn```
+- Get the latest version of this repo  
+- Open a terminal in the project folder and type: ```yarn```
 - If that doesn't work remove the node_modules folder and try start again
 
 ### configure
