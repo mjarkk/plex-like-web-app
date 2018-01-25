@@ -69,3 +69,4 @@ Open in a text editor **conf/servconfig.json**
 - :x: Switch from a white to black color scheme inside settings
 - :x: Make tests to check if everyting works fine
 - :heavy_check_mark: Setup
+- :heavy_check_mark: Add [The Movie DB API](https://www.themoviedb.org/) to the movie section on
