@@ -12,6 +12,7 @@ const path = require('path')
 const shell = require('shelljs')
 const os = require('os')
 const img = require('./img.js')
+const movies = require('./movies.js')
 
 // the basic ffmpeg input
 const ffmpegAdd = (toadd) => `ffmpeg -v quiet -stats ${(typeof toadd == 'string') ? `${toadd} ` : ''}-y -i`
@@ -390,5 +391,19 @@ x.SendVideoPoster = (input) => {
       // if input is invalid end the reqest
       input.res.end()
     }
+  }
+}
+
+// geta a list of possible movies
+// data = {
+//   query: <string (the title from the movie / serie)>
+// }
+x.GetVideoSurgestions = (data, callback) => {
+  if (movies.supported && data && typeof callback == 'function' && typeof data.query == 'string') {
+    movies.search({query: data.query}, (data) => {
+      callback(data)
+    })
+  } else {
+    callback(false)
   }
 }

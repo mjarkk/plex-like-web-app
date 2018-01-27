@@ -41,9 +41,7 @@ var home = new Vue({
           username: 'admin'
         }]
       },
-      client: {
-
-      }
+      client: {}
     },
     images: {
       rechedend: false,
@@ -55,6 +53,8 @@ var home = new Vue({
     },
     movies: {
       list: [],
+      SearchMovieInfo: false,
+      NewDataMovieInfo: false,
       ShowMoreInfo: false,
       selectedID: 0,
       selectedEdit: false,
@@ -64,8 +64,8 @@ var home = new Vue({
           name: '',
           poster: ''
         },
-        id: '30dc0050ba21d0ffe3743619c51181506c5ccda0',
-        moviename: 'Mr.Robot.S03E09.720p.HDTV.x264-AVS',
+        id: '',
+        moviename: '',
         poster: true,
         show: true,
       }
@@ -254,9 +254,61 @@ var home = new Vue({
       for (var i = 0; i < serveroptions.length; i++) {
         home.settings.server[serveroptions[i] + 'err'] = ''
       }
+    },
+    getMovieSurgestions: (tosearch, force) => {
+      // fetch info about a movie when a user changes the title of a movie
+      // use force if you want to force the script searching new movies
+      if (!home.movies.SearchMovieInfo || force) {
+        home.movies.SearchMovieInfo = true
+        home.movies.selected['lastmoviename'] = home.movies.selected.moviename
+        fetch(`/searchmovie/${encodeURIComponent(tosearch)}`, {method: 'post',credentials: 'same-origin'})
+        .then(res => res.json())
+        .then(jsondata => {
+          WebWorker.postMessage({
+            what: 'decryptjson',
+            key: localStorage.getItem('key'),
+            todecrypt: jsondata.data,
+            sideload: 'searchmoviesinfo'
+          })
+        })
+        .catch((e) => true)
+      } else {
+        home.movies.NewDataMovieInfo = true
+      }
+    },
+    useMovieSurgestions: (data) => {
+      // use the movie info that is aked to fetch by home.getMovieSurgestions
+      let dune = () => {
+        if (home.movies.NewDataMovieInfo) {
+          home.movies.NewDataMovieInfo = false; // need to use ';' otherwise the script fails
+          (home.movies.selected['lastmoviename'] == home.movies.selected.moviename) ?
+            home.getMovieSurgestions(home.movies.selected.belongs.name, true) :
+            home.getMovieSurgestions(home.movies.selected.moviename, true)
+        } else {
+          home.movies.SearchMovieInfo = false
+        }
+      }
+      if (data.status) {
+        let surgestions = data.data
+        log(surgestions)
+        // TODO: add the surgestions to the movie list
+        dune()
+      } else {
+        dune()
+      }
     }
   },
   watch: {
+    'movies.selected.moviename': (newval, oldval) => {
+      if (home.movies.selectedEdit) {
+        home.getMovieSurgestions(newval)
+      }
+    },
+    'movies.selected.belongs.name': (newval, oldval) => {
+      if (home.movies.selectedEdit) {
+        home.getMovieSurgestions(newval)
+      }
+    },
     activeapp: (newval, oldval) => {
       UrlHandeler.changePath(newval)
       // load the right data for the view when it's clicked
@@ -396,5 +448,7 @@ WebWorker.addEventListener('message', (msg) => {
       })
     }
     home.createVideoList(touse)
+  } else if (data.what == 'searchmoviesinfo') {
+    home.useMovieSurgestions(data)
   }
 })

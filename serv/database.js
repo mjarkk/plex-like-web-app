@@ -12,6 +12,7 @@ const randomstring = require('randomstring')
 const sha1File = require('sha1-file')
 const questions = require('questions')
 const path = require('path')
+const movies = require('./movies.js')
 
 const check = require('./check.js')
 const globvars = {

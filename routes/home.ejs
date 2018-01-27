@@ -40,14 +40,16 @@
             <div class="info">
               <div class="title">
                 <p class="inf">Movie name:</p>
-                <p v-if="!movies.selectedEdit" class="b-content">{{ movies.selected.moviename.replace(/\./g,' ') }}</p>
+                <p v-if="!movies.selectedEdit" class="b-content">{{ movies.selected.moviename.replace(/\./g,' ') || '---' }}</p>
                 <input v-if="movies.selectedEdit" type="text" v-model="movies.selected.moviename">
               </div>
               <div class="belongsto">
                 <p class="inf">Belongs to serie</p>
-                <p class="b-content" v-if="movies.selected.belongs.name && !movies.selectedEdit">{{ movies.selected.belongs.name }}</p>
-                <p class="b-content" v-if="!movies.selected.belongs.name && !movies.selectedEdit">---</p>
+                <p class="b-content" v-if="!movies.selectedEdit">{{ movies.selected.belongs.name || '---' }}</p>
                 <input v-if="movies.selectedEdit" type="text" v-model="movies.selected.belongs.name">
+              </div>
+              <div class="surgestions" v-if="movies.selectedEdit">
+
               </div>
             </div>
           </div>

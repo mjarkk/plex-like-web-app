@@ -6,5 +6,6 @@
   "imagedirs": [],
   "moviedirs": [],
   "musicdirs": [],
-  "setup": true
+  "setup": true,
+  "TheMovieDbApiKey": ""
 }

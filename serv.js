@@ -107,6 +107,22 @@ app.get('/movieposter/:id', (req,res) => {
   dba.checkuser(tosend, (UserData) => video.SendVideoPoster(tosend))
 })
 
+// geta a list of possible movies
+app.post('/searchmovie/:name', (req, res) => {
+  let tosend = {
+    req: req,
+    res: res,
+    type: 'json',
+    query: req.params.name
+  }
+  dba.checkuser(tosend, (UserData) => video.GetVideoSurgestions(tosend, (Surgestions) => {
+    res.json({
+      status: true,
+      data: dba.encrypt(Surgestions, UserData.key)
+    })
+  }))
+})
+
 // get a index of all images to request
 app.post('/imageindex/:index/:amound', (req, res) => {
   let tosend = {

@@ -21,7 +21,7 @@ reqfile = (required, callback) => {
     }
     return returnval
   }
-  if (typeof(r) == 'string') {
+  if (typeof r == 'string') {
     if (checkRequiredArray()) {
       callback()
     } else {
