@@ -58,6 +58,10 @@ var home = new Vue({
       ShowMoreInfo: false,
       selectedID: 0,
       selectedEdit: false,
+      surgestions: {
+        movies: [],
+        series: []
+      },
       selected: {
         background: '',
         belongs: {
@@ -291,7 +295,8 @@ var home = new Vue({
       if (data.status) {
         let surgestions = data.data
         log(surgestions)
-        // TODO: add the surgestions to the movie list
+        home.movies.surgestions.movies = surgestions.movies
+        home.movies.surgestions.series = surgestions.series
         dune()
       } else {
         dune()

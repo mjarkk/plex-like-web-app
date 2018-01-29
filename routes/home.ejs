@@ -48,8 +48,22 @@
                 <p class="b-content" v-if="!movies.selectedEdit">{{ movies.selected.belongs.name || '---' }}</p>
                 <input v-if="movies.selectedEdit" type="text" v-model="movies.selected.belongs.name">
               </div>
-              <div class="surgestions" v-if="movies.selectedEdit">
-
+              <div class="surgestions" v-if="movies.selectedEdit && movies.surgestions.movies.results">
+                <h3>Surgestions</h3>
+                <div class="item" v-if="id < 3" v-for="(movie, id) in movies.surgestions.movies.results">
+                  <div class="previewimg" v-bind:style="{ 'background-image': `url(${movie.poster_path})` }"></div>
+                  <div class="extra">
+                    <div class="name">{{movie.name}}</div>
+                    <div class="overview">{{movie.overview}}</div>
+                  </div>
+                </div>
+                <div class="item" v-if="id < 3" v-for="(serie, id) in movies.surgestions.series.results">
+                  <div class="previewimg" v-bind:style="{ 'background-image': `url(http://image.tmdb.org/t/p/w154/${serie.poster_path})` }"></div>
+                  <div class="extra">
+                    <div class="name">{{serie.name}}</div>
+                    <div class="overview">{{serie.overview}}</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

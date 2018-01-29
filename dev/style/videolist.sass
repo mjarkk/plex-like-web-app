@@ -86,6 +86,33 @@
       width: 50%
       height: 100%
       border-left: 2px solid #eee
+      .surgestions
+        .item
+          display: flex
+          flex-direction: row
+          flex-wrap: nowrap
+          max-height: 100px
+          overflow: hidden
+          cursor: pointer
+          margin: 10px
+          height: 72px
+          .previewimg
+            height: 60px
+            width: 50px
+            margin: 10px
+            min-width: 50px
+            border-radius: 5px
+            background-position: center
+            background-size: cover
+            background-repeat: no-repeat
+          .extra
+            display: flex
+            flex-direction: column
+            .name
+              font-size: 21px
+              font-weight: 600
+            .overview
+              font-size: 13px
       .buttons
         height: 40px
         border-bottom: 2px solid #eee
