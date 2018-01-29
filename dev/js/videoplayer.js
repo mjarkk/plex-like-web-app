@@ -77,11 +77,11 @@ var moviePlayer = new Vue({
     },
     closeplayer: () => {
       let mainel = document.querySelector('.videoplayer-vue')
-      mainel.style.display = 'none'
       document.querySelector('#videoplayer-shaka').pause()
       if (mainel.style.display != 'none') {
         UrlHandeler.changePath(moviePlayer.lasturl)
       }
+      mainel.style.display = 'none'
       moviePlayer.player = {}
     },
     movevolume: (ev) => {

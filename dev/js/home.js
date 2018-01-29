@@ -76,6 +76,11 @@ var home = new Vue({
     }
   },
   methods: {
+    saveMovieInfo: () => {
+      // save the eddited data to the database
+      // TODO: send data to the database
+      home.movies.selectedEdit = false
+    },
     openmoreinfo: (movie) => {
       home.movies.ShowMoreInfo = true
       home.movies.selected = movie
@@ -83,6 +88,9 @@ var home = new Vue({
     closeVideoPopup: (ev) => {
       if (ev.srcElement.classList[0] == 'video-popup') {
         home.movies.ShowMoreInfo = false
+        home.movies.surgestions.movies = []
+        home.movies.surgestions.series = []
+        home.movies.selectedEdit = false
       }
     },
     fetchMovieList: () => {
@@ -102,7 +110,6 @@ var home = new Vue({
     createVideoList: (data) => {
       // this fuction is used to handele the belongs object inside data
       home.movies.list = data
-      log(data)
     },
     openmovie: (movie) => {
       document.querySelector('.videoplayer-vue').style.display = 'block'
@@ -267,15 +274,15 @@ var home = new Vue({
         home.movies.selected['lastmoviename'] = home.movies.selected.moviename
         fetch(`/searchmovie/${encodeURIComponent(tosearch)}`, {method: 'post',credentials: 'same-origin'})
         .then(res => res.json())
-        .then(jsondata => {
+        .then(jsondata =>
           WebWorker.postMessage({
             what: 'decryptjson',
             key: localStorage.getItem('key'),
             todecrypt: jsondata.data,
             sideload: 'searchmoviesinfo'
           })
-        })
-        .catch((e) => true)
+        )
+        .catch((e) => home.movies.SearchMovieInfo = false) // if the fetch gives a error reset the search lock
       } else {
         home.movies.NewDataMovieInfo = true
       }
@@ -294,7 +301,6 @@ var home = new Vue({
       }
       if (data.status) {
         let surgestions = data.data
-        log(surgestions)
         home.movies.surgestions.movies = surgestions.movies
         home.movies.surgestions.series = surgestions.series
         dune()
@@ -306,12 +312,12 @@ var home = new Vue({
   watch: {
     'movies.selected.moviename': (newval, oldval) => {
       if (home.movies.selectedEdit) {
-        home.getMovieSurgestions(newval)
+        home.getMovieSurgestions(newval.replace(/\./g, ' '))
       }
     },
     'movies.selected.belongs.name': (newval, oldval) => {
       if (home.movies.selectedEdit) {
-        home.getMovieSurgestions(newval)
+        home.getMovieSurgestions(newval.replace(/\./g, ' ')) // remove all the "." because some downloaded movies have a lot of "." instad of spaces
       }
     },
     activeapp: (newval, oldval) => {
@@ -387,7 +393,6 @@ WebWorker.addEventListener('message', (msg) => {
     home.settingsloaded = true
   } else if (data.what == 'updatethings') {
     // callback from the server for updating the settings
-    // log(data)
 
     home.settings.server.updatebtndisabled = false
     if (data.res.errors) {
