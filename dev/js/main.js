@@ -135,3 +135,13 @@ class urlhandeler {
 
 // create a url handeler and make it global so all the js files can make use of it
 let UrlHandeler = new urlhandeler()
+
+window.randomString = (len, charSet) => {
+  charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = '';
+  for (var i = 0; i < len; i++) {
+    let randomPoz = Math.floor(Math.random() * charSet.length);
+    randomString += charSet.substring(randomPoz,randomPoz+1);
+  }
+  return randomString;
+}

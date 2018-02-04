@@ -57,6 +57,7 @@ var home = new Vue({
       NewDataMovieInfo: false,
       ShowMoreInfo: false,
       selectedID: 0,
+      movieupdating: false,
       selectedEdit: false,
       surgestions: {
         movies: [],
@@ -76,10 +77,33 @@ var home = new Vue({
     }
   },
   methods: {
+    selectSurgestedMovie: (type, data) => {
+      if (type == 'serie') {
+        home.movies.selected.belongs.name = data.name
+        home.movies.selected.belongs.poster = `http://image.tmdb.org/t/p/w500/${ data.poster_path }`
+        home.movies.selected.belongs['TheMovieDbId'] = data.id
+      } else {
+        home.movies.selected['TheMovieDbId'] = data.id
+        home.movies.selected.moviename = data.name
+      }
+      log(type, data)
+    },
+    updateMovieDetailsCallback: (data) => {
+      log(data)
+      home.movies.movieupdating = false
+      home.movies.selectedEdit = false
+    },
     saveMovieInfo: () => {
       // save the eddited data to the database
-      // TODO: send data to the database
-      home.movies.selectedEdit = false
+      let NewMovieData = home.movies.selected
+      home.movies.movieupdating = true
+      WebWorker.postMessage({
+        what: 'sendmsg',
+        location: `/updatemovie/${ NewMovieData.id }`,
+        key: localStorage.getItem('key'),
+        data: NewMovieData,
+        sideload: 'updateMovieDetails'
+      })
     },
     openmoreinfo: (movie) => {
       home.movies.ShowMoreInfo = true
@@ -460,5 +484,7 @@ WebWorker.addEventListener('message', (msg) => {
     home.createVideoList(touse)
   } else if (data.what == 'searchmoviesinfo') {
     home.useMovieSurgestions(data)
+  } else if (data.what == 'updateMovieDetails') {
+    home.updateMovieDetailsCallback(data)
   }
 })

@@ -115,6 +115,64 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
 
+  // Update a video in the database and download/make new files if that is neededs
+  // data = {
+  //   req: <req from a post/get message>,
+  //   res: <res from a post/get message>,
+  //   id: <string (movie id/sha1)>
+  // }
+  x.UpdateVideoProviel = (data, callback) => {
+
+    // dune is a wrapper for the callback because sometimes the code will..
+    // send 2 times a callback that will result in a error with express.js
+    // also the callback might not be defined so check if it's defined
+    let AlreadyDune = false
+    dune = (callbackdata) => {
+      if (!AlreadyDune && typeof callback == 'function') {
+        callback(callbackdata)
+        AlreadyDune = true
+      }
+    }
+
+    checkencryptionHolder = () =>
+      checkencryption(data.req.body.tochange)
+        .then(encryptstatus => {
+          if (encryptstatus) {
+            DecryptUserData({
+              username: data.req.signedCookies.username,
+              decrypt: data.req.body.tochange
+            }, handelData)
+          } else {
+            dune(nope)
+          }
+        })
+
+    handelData = (DecryptedData) => {
+      if (DecryptedData.status) {
+        let tochange = DecryptedData.data
+        if (tochange.TheMovieDbId) {
+          // TODO: fetch the movie poster from the moviedb
+        }
+        db.collection('videos').updateOne(
+          { id: tochange.id },
+          { "$set": tochange },
+          {new: true, upsert: true},
+          (err, doc) => {
+            dune(tochange)
+          }
+        )
+      } else {
+        dune(nope)
+      }
+    }
+
+    if (data && data.req && data.res && typeof data.id == 'string') {
+      checkencryptionHolder()
+    } else {
+      dune(nope)
+    }
+  }
+
   // create a database entery for a specifice video file
   // data = {
   //   original: <string (the original file location)>,

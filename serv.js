@@ -61,7 +61,7 @@ const img = require('./serv/img.js')
 const video = require('./serv/video.js')
 
 // get all content from the css file
-app.get('/style.css', (req, res) => fs.readdir('./www/style/', function(err, items) {
+app.get('/style.css', (req, res) => fs.readdir('./www/style/', (err, items) => {
   res.set('Content-Type', 'text/css')
   let combinedfile = ''
   const addfiles = (count) => {
@@ -121,6 +121,21 @@ app.post('/searchmovie/:name', (req, res) => {
       data: dba.encrypt(Surgestions, UserData.key)
     })
   }))
+})
+
+// update movie
+app.post('/updatemovie/:id', (req, res) => {
+  let tosend = {
+    req: req,
+    res: res,
+    type: 'json',
+    id: req.params.id
+  }
+  dba.checkuser(tosend, (UserData) =>
+    dba.UpdateVideoProviel(tosend, (CallbackData) =>
+      res.json(CallbackData)
+    )
+  )
 })
 
 // get a index of all images to request
