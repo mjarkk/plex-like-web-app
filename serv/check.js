@@ -2,17 +2,15 @@ const fs = require('fs-extra')
 const x = exports
 
 // a wrapper for string.prototype.includes
-inc = (string,includes) => {
-  return string.includes(includes)
-}
+inc = (string,includes) => string.includes(includes)
 
 x.checkofficalurl = (url) => {
   return ((
     url == '/' ||
     url == '' ||
     url == '/login' ||
-    inc(url,'/video/') ||
-    inc(url,'/videos/') ||
+    url == '/movies' ||
+    inc(url,'/movies/') ||
     inc(url,'/music/') ||
     inc(url,'/album/') ||
     inc(url,'/home/') ||
@@ -21,19 +19,19 @@ x.checkofficalurl = (url) => {
 }
 
 x.getpage = (url) => {
-  if ((url == '/') || (url = '') || inc(url,'/home/')) {
-    return 'home'
+  let toReturn = ''
+  if ((url == '/') || (url == '') || inc(url,'/home')) {
+    toReturn = 'home'
   } else if (url == '/login') {
-    return 'login'
-  } else if (inc(url,'/video/')) {
-    return 'video'
-  } else if (inc(url,'/videos/')) {
-    return 'videos'
-  } else if (inc(url,'/murlsic/') || inc(url,'/alburlm/')) {
-    return 'murlsic'
-  } else if (inc(urlrl,'/settings/')) {
-    return 'settings'
+    toReturn = 'login'
+  } else if (inc(url,'/movies')) {
+    toReturn = 'movies'
+  } else if (inc(url,'/music') || inc(url,'/alburlm')) {
+    toReturn = 'music'
+  } else if (inc(url,'/settings')) {
+    toReturn = 'settings'
   }
+  return toReturn
 }
 
 x.CheckDirEx = (path) => {

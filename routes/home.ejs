@@ -28,7 +28,6 @@
             </div>
             <div class="tip" v-if="movies.selected.belongs.name"><h3>Episode</h3></div>
             <div class="episode" v-if="movies.selected.belongs.name && movies.selected.belongs.name == episode.belongs.name" v-for="episode in movies.list">
-              <!--  -->
               <div class="title">
                 {{ episode.moviename.replace(/\./g,' ') }}
               </div>

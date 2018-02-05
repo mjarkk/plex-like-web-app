@@ -45,13 +45,16 @@ reqfile = (required, callback) => {
 window.onload = () => {
   if (localStorage.getItem("key") && localStorage.getItem("username") && localStorage.getItem("PBKF2password")) {
     let page = currentpage
-    log('startpage:',page)
+    log('startpage:', page)
     if (page == 'home') {
       DisplayFlex('.home-vue')
     } else if (page == 'login') {
       reqfile('login', () => {
         DisplayFlex('.login-vue')
       })
+    } else if (page == 'movies') {
+      DisplayFlex('.home-vue')
+      home.activeapp = 'movies'
     }
   } else {
     reqfile('login', () => {
