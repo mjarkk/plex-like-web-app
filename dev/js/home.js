@@ -52,7 +52,8 @@ var home = new Vue({
       imagesindexes: {}
     },
     movies: {
-      list: [],
+      todisplay: [], // to display
+      list: [], // this contains all movies and series in the libary
       SearchMovieInfo: false,
       NewDataMovieInfo: false,
       ShowMoreInfo: false,
@@ -86,10 +87,9 @@ var home = new Vue({
         home.movies.selected['TheMovieDbId'] = data.id
         home.movies.selected.moviename = data.name
       }
-      log(type, data)
     },
     updateMovieDetailsCallback: (data) => {
-      log(data)
+      // after the values on screen are saved
       home.movies.movieupdating = false
       home.movies.selectedEdit = false
     },
@@ -106,10 +106,12 @@ var home = new Vue({
       })
     },
     openmoreinfo: (movie) => {
+      // open the movie or serie more info screen
       home.movies.ShowMoreInfo = true
       home.movies.selected = movie
     },
     closeVideoPopup: (ev) => {
+      // close the movie or serie more info screen
       if (ev.srcElement.classList[0] == 'video-popup') {
         home.movies.ShowMoreInfo = false
         home.movies.surgestions.movies = []
@@ -134,6 +136,19 @@ var home = new Vue({
     createVideoList: (data) => {
       // this fuction is used to handele the belongs object inside data
       home.movies.list = data
+      home.movies.todisplay = []
+      let series = []
+      for (var i = 0; i < home.movies.list.length; i++) {
+        let add = () => home.movies.todisplay.push(home.movies.list[i])
+        if (home.movies.list[i].belongs.name) {
+          if (series.indexOf(home.movies.list[i].belongs.name) == -1) {
+            series.push(home.movies.list[i].belongs.name)
+            add()
+          }
+        } else {
+          add()
+        }
+      }
     },
     openmovie: (movie) => {
       document.querySelector('.videoplayer-vue').style.display = 'block'

@@ -9,7 +9,8 @@
       <div class="item">{{ appname }}</div>
     </div>
     <div class="header2">
-      <h1>{{ activeapp.capitalize() }}</h1>
+      <h1 v-if="activeapp == 'movies'">Movies / Series</h1>
+      <h1 v-else>{{ activeapp.capitalize() }}</h1>
     </div>
 
     <!-- movies -->
@@ -23,6 +24,20 @@
                   <path d="M0 0h24v24H0z" fill="none"/>
                   <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
                 </svg>
+              </div>
+            </div>
+            <div class="tip" v-if="movies.selected.belongs.name"><h3>Episode</h3></div>
+            <div class="episode" v-on:click="openmovie(episode)" v-if="movies.selected.belongs.name && movies.selected.belongs.name == episode.belongs.name" v-for="episode in movies.list">
+              <div class="title">
+                {{ episode.moviename.replace(/\./g,' ') }}
+              </div>
+              <div class="extra">
+                <div class="info">
+
+                </div>
+                <div class="play">
+
+                </div>
               </div>
             </div>
           </div>
@@ -71,12 +86,13 @@
         </div>
       </div>
       <div class="all">
-        <div class="movie-item" v-for="movie in movies.list" v-on:click="openmoreinfo(movie)">
+        <div class="movie-item" v-for="movie in movies.todisplay" v-on:click="openmoreinfo(movie)">
           <div class="poster" v-bind:style="{'background-image': `url(${(movie.belongs.poster) ? movie.belongs.poster : (movie.poster) ? `/movieposter/${movie.id}` : `/movieposter/basic`})`}">
 
           </div>
           <div class="inf">
-            <h3>{{ movie.moviename.replace(/\./g,' ') }}</h3>
+            <h3 v-if="movie.belongs.name">{{ movie.belongs.name }}</h3>
+            <h3 v-else>{{ movie.moviename.replace(/\./g,' ') }}</h3>
           </div>
         </div>
       </div>
