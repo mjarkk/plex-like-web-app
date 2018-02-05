@@ -54,15 +54,35 @@
     box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22)
     display: flex
     .generalinf
+      overflow-x: hidden
+      overflow-y: scroll
       width: 50%
       height: 100%
+      &::-webkit-scrollbar
+        width: 10px
+      &::-webkit-scrollbar-thumb
+        background-color: #eee
+        &:hover
+          background-color: #ddd
       .tip h3
         padding: 5px 15px
         border-top: 2px solid #eee
       .episode
         padding: 3px
         padding: 3px
-        cursor: pointer
+        display: flex
+        .extra
+          display: flex
+          align-items: center
+          justify-content: center
+          svg
+            cursor: pointer
+            height: 30px
+            width: 30px
+            fill: black
+            transition: fill 0.2s
+            &:hover
+              fill: #71189d
       .titleimg
         height: 50%
         width: 100%
@@ -84,14 +104,18 @@
           -webkit-box-shadow: 0px 10px 81px -12px rgba(0,0,0,0.78)
           -moz-box-shadow: 0px 10px 81px -12px rgba(0,0,0,0.78)
           box-shadow: 0px 10px 81px -12px rgba(0,0,0,0.78)
+          transform: scale(0.95,0.95)
+          transition: transform 0.3s
           svg
             opacity: 0.3
             transition: opacity 0.3s
             height: 60px
             width: 60px
             cursor: pointer
-          &:hover svg
-            opacity: 1
+          &:hover
+            transform: scale(1,1)
+            svg
+              opacity: 1
     .otherinf
       width: 50%
       height: 100%

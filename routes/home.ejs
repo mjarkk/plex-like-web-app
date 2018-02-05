@@ -27,16 +27,23 @@
               </div>
             </div>
             <div class="tip" v-if="movies.selected.belongs.name"><h3>Episode</h3></div>
-            <div class="episode" v-on:click="openmovie(episode)" v-if="movies.selected.belongs.name && movies.selected.belongs.name == episode.belongs.name" v-for="episode in movies.list">
+            <div class="episode" v-if="movies.selected.belongs.name && movies.selected.belongs.name == episode.belongs.name" v-for="episode in movies.list">
+              <!--  -->
               <div class="title">
                 {{ episode.moviename.replace(/\./g,' ') }}
               </div>
               <div class="extra">
                 <div class="info">
-
+                  <svg v-on:click="openmoreinfo(episode)" fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                  </svg>
                 </div>
                 <div class="play">
-
+                  <svg v-on:click="openmovie(episode)" fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+                  </svg>
                 </div>
               </div>
             </div>
