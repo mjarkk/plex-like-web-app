@@ -42,6 +42,7 @@ Open in a text editor **conf/servconfig.json**
 - If you see a lot of: [nodemon] files triggering change check: some/directory/some.file, Solution: npm i -g nodemon@debug
 - On linux (probably the same on mac and windows) chrome will eat you're RAM when working with the shaka player
 - Sometimes the ```serv/video.js``` file will fail on start because the database is not ready  
+- Sometimes the ```serv/video.js``` file will re-render a complete video because the sha1 is not the same as last time
 
 ## Tested on:
 ### Linux (ubuntu 17.10)

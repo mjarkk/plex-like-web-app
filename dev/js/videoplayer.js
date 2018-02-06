@@ -170,6 +170,17 @@ var moviePlayer = new Vue({
       UrlHandeler.changePath(`/movie/${movie.id}`)
     },
     initPlayer: () => {
+      var playerWrapper = document.querySelector('.player-wrapper')
+      playerWrapper.innerHTML = ''
+      playerWrapper.innerHTML = `
+        <video id="videoplayer-shaka"
+        class="videoplayer-js"
+        width="600"
+        height="400"
+        poster=""
+        onclick="playPauseVideoPlayer()"
+        autoplay></video>
+      `
       var video = document.querySelector('#videoplayer-shaka')
       moviePlayer.player = new shaka.Player(video)
       moviePlayer.player.addEventListener('error', onErrorEvent)
@@ -203,3 +214,7 @@ onError = (error) => {
 }
 
 initApp()
+
+playPauseVideoPlayer = () => {
+  moviePlayer.playPause()
+}

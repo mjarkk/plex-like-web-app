@@ -1,11 +1,13 @@
 <div class="videoplayer-vue" v-on:keydown="keydown">
-  <video id="videoplayer-shaka"
-  class="videoplayer-js"
-  width="600"
-  height="400"
-  poster=""
-  v-on:click="playPause()"
-  autoplay></video>
+  <div class="player-wrapper">
+    <video id="videoplayer-shaka"
+    class="videoplayer-js"
+    width="600"
+    height="400"
+    poster=""
+    onclick="playPauseVideoPlayer()"
+    autoplay></video>
+  </div>
   <div class="video-header">
     <div class="back" v-on:click="closeplayer()">
       <svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
