@@ -119,12 +119,34 @@ var moviePlayer = new Vue({
         videl.play()
       }
     },
+    movepreview: (ev) => {
+      // fill in the preview div with a propper image and place it where the cursor is
+      let videl = document.querySelector('#videoplayer-shaka')
+      let progressBar = document.querySelector('.slider .holder')
+      let pos = 100 / progressBar.offsetWidth * (ev.pageX - progressBar.offsetLeft)
+      let newtime = videl.duration / 100 * pos
+      let PBW = progressBar.offsetWidth // pbw = progess bar width
+      let preview = document.querySelector('body > div.videoplayer-vue > div.video-controls > div.slider > div > div.preview > div')
+      preview.style.display = 'inline-block'
+      preview.style.backgroundImage = `url('/moviepreview/${moviePlayer.movie.id}/${Math.round(newtime / 20)}')`
+      preview.style.transform = `translateX(${PBW / 100 * pos}px)`
+    },
+    removepreview: () => {
+      // remove the preview window
+      let preview = document.querySelector('body > div.videoplayer-vue > div.video-controls > div.slider > div > div.preview > div')
+      preview.style.display = 'none'
+    },
     updatetimeline: () => {
       let videl = document.querySelector('#videoplayer-shaka')
       let pos = 100 / videl.duration * videl.currentTime
       let progressBar = document.querySelector('.slider .holder')
       let PBW = progressBar.offsetWidth // pbw = progess bar width
       progressBar.querySelector('.process').style.left = ((PBW / 100 * pos) - 8) + 'px'
+    },
+    playPause: () => {
+      moviePlayer.control.paused ?
+        moviePlayer.play() :
+        moviePlayer.pause()
     },
     play: () => {
       document.querySelector('#videoplayer-shaka').play()

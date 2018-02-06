@@ -4,6 +4,7 @@
   width="600"
   height="400"
   poster=""
+  v-on:click="playPause()"
   autoplay></video>
   <div class="video-header">
     <div class="back" v-on:click="closeplayer()">
@@ -29,13 +30,12 @@
         </svg>
       </div>
     </div>
-    <div class="slider">
-      <div class="holder" v-on:click="timelineclick">
-        <div class="process">
-          <div class="preview">
-            <div class="inside"></div>
-          </div>
+    <div class="slider" v-on:mouseleave="removepreview">
+      <div class="holder" v-on:click="timelineclick" v-on:mousemove="movepreview" v-on:mouseover="movepreview">
+        <div class="preview">
+          <div class="inside"></div>
         </div>
+        <div class="process"></div>
       </div>
     </div>
     <div class="cast" v-if="false">

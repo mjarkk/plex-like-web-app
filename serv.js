@@ -78,6 +78,18 @@ app.get('/style.css', (req, res) => fs.readdir('./www/style/', (err, items) => {
   addfiles(0)
 }))
 
+// get a preview image from a part of a movie
+app.get('/moviepreview/:id/:part', (req, res) => {
+  let tosend = {
+    req: req,
+    res: res,
+    type: 'text',
+    id: req.params.id,
+    part: req.params.part
+  }
+  dba.checkuser(tosend, (UserData) => video.sendVideoPreview(tosend))
+})
+
 // get a list of all videos to request
 app.post('/videoindex/', (req, res) => {
   let tosend = {

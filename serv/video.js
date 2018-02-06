@@ -407,3 +407,46 @@ x.GetVideoSurgestions = (data, callback) => {
     callback(false)
   }
 }
+
+// give a image preview about a part of a movie
+// data = {
+//   req: <req (from a post/get message)>,
+//   res: <res (from a post/get message)>,
+//   id: <string (id / sha1 of the movie)>,
+//   part: <string (nummer of part that the user needs)>
+// }
+x.sendVideoPreview = (data) => {
+  if (
+    data &&
+    data.req &&
+    data.res &&
+    typeof data.id == 'string' &&
+    typeof data.part == 'string' &&
+    data.part.length < 10 &&
+    !data.part.includes('/') &&
+    !data.part.includes('.') &&
+    !data.id.includes('/') &&
+    !data.id.includes('.')
+  ) {
+    let location = path.join(__dirname, `../appdata/movies/public/${data.id}/preview/`)
+    if (fs.existsSync(location)) {
+      fs.readdir(location, (err, items) => {
+        let nullAmounds = items[0].length - 6
+        let nulls = '000000000'
+        let fileToSend = path.join(
+          location,
+          `t-${nulls.substr(0, nullAmounds - data.part.length)}${data.part}.jpg` // place nulls before the value like from `36` to `0036` or `036`
+        )
+        if (fs.existsSync(fileToSend)) {
+          data.res.sendFile(fileToSend)
+        } else {
+          data.res.end()
+        }
+      })
+    } else {
+      data.res.end()
+    }
+  } else {
+    data.res.end()
+  }
+}
