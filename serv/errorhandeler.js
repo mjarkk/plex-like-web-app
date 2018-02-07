@@ -2,28 +2,36 @@
 
 // required packages
 const fs = require('fs-extra')
+const path = require('path')
 
-const errorpath = `./errors/`
+const errorpath = `../errors/`
+const fullPath = (file) => path.resolve(__dirname, errorpath, file)
 const x = exports
+
 const files = {
-  database: errorpath + 'database.log',
-  img: errorpath + 'img.log',
-  js: errorpath + 'js.log',
-  sass: errorpath + 'sass.log',
-  serv: errorpath + 'serv.log'
+  database: fullPath('database.log'),
+  img: fullPath('img.log'),
+  js: fullPath('js.log'),
+  sass: fullPath('sass.log'),
+  serv: fullPath('serv.log')
 }
 
 // make shure the errors direcotry exsist
 fs.ensureDirSync(errorpath)
 
-let mkerr = (file, err) => {
+let mkerr = (file, err, callback) => {
+  let dune = () => {
+    if (typeof callback == 'function') {
+      callback()
+    }
+  }
   if (fs.existsSync(file)) {
-    fs.appendFile(file, error, (output) => {
-
+    fs.appendFile(file, err + '\n\n', (output) => {
+      dune()
     })
   } else {
-    fs.outputFile(file, error, (output) => {
-
+    fs.outputFile(file, err + '\n\n', (output) => {
+      dune()
     })
   }
 }
