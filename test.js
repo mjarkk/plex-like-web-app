@@ -17,19 +17,42 @@ if (fs.existsSync(confFile)) {
   // require the global config
 
   const js = require('./serv/js.js')
-  // const css = require('./serv/sass.js')
+  const css = require('./serv/sass.js')
 
   test.cb('create js files', t => {
     t.plan(1)
-    js.run(data => {
-      if (data.length > 0) {
-        log(data.red.bold)
-        t.fail()
-      } else {
-        t.pass()
-      }
-  		t.end()
-    })
+    try {
+      js.run(data => {
+        if (data.length > 0) {
+          log(data.red.bold)
+          t.fail()
+        } else {
+          t.pass()
+        }
+    		t.end()
+      })
+    } catch (e) {
+      t.fail()
+      t.end()
+    }
+  })
+
+  test.cb('create css files', t => {
+    t.plan(1)
+    try {
+      css.run(data => {
+        if (data.length > 0) {
+          log(data.red.bold)
+          t.fail()
+        } else {
+          t.pass()
+        }
+    		t.end()
+      })
+    } catch (e) {
+      t.fail()
+      t.end()
+    }
   })
 
 } else {
