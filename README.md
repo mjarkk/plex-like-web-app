@@ -27,6 +27,10 @@ And it needs to be mobile friendly of course.
 ### Start
 - ```yarn start```
 
+### Testing
+- To install: ```npm install --global ava@next```  
+- To run: ```yarn test```  
+
 ### Update
 - Get the latest version of this repo  
 - Open a terminal in the project folder and type: ```yarn```
@@ -70,6 +74,6 @@ Open in a text editor **conf/servconfig.json**
 - :x: Music
 - :heavy_check_mark: URL handler
 - :x: Switch from a white to black color scheme inside settings
-- :x: Make tests to check if everyting works fine
+- :heavy_check_mark: Make tests to check if everyting works fine
 - :heavy_check_mark: Setup
 - :heavy_check_mark: Add [The Movie DB API](https://www.themoviedb.org/) to the movie section on

@@ -4,11 +4,13 @@
   "description": "a plex like web app",
   "main": "serv.manager.js",
   "scripts": {
-    "start": "node serv.manager.js"
+    "start": "node serv.manager.js",
+    "test": "ava"
   },
   "author": "mjarkk",
   "license": "Apache-2.0",
   "dependencies": {
+    "ava": "^1.0.0-beta.1",
     "await-fs": "^1.0.0",
     "babel-core": "^6.26.0",
     "body-parser": "^1.18.2",
