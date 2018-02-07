@@ -13,6 +13,8 @@ const MongoClient = require('mongodb').MongoClient
 shell.exec('chmod +x dev/shaka-packager/linux')
 shell.exec('chmod +x dev/shaka-packager/macos')
 
+global.testingCode = false
+
 global.log = console.log
 
 // check if there is already a config file

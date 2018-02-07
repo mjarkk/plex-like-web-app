@@ -13,6 +13,8 @@ let initApp = () => {
 var moviePlayer = new Vue({
   el: '.videoplayer-vue',
   data: {
+    controlsHidden: true,
+    controlsNewReq: [0,0,0],
     lasturl: '',
     player: {},
     control: {
@@ -29,7 +31,32 @@ var moviePlayer = new Vue({
     }
   },
   methods: {
+    forceControls: (input) => {
+      moviePlayer.controlsNewReq[2] = (input) ? 1 : 0
+    },
+    holdControls: () => {
+
+      // test if the user is moving it's mouse
+      let vm = moviePlayer
+      vm.controlsHidden = false
+      if (vm.controlsNewReq[0] == 0) {
+        vm.controlsNewReq[0] = 1
+        setTimeout(() => {
+          if (vm.controlsNewReq[1] == 1 || vm.controlsNewReq[2] == 1) {
+            vm.controlsNewReq = [0,0,vm.controlsNewReq[2]]
+            vm.holdControls()
+          } else {
+            vm.controlsNewReq = [0,0,vm.controlsNewReq[2]]
+            vm.controlsHidden = true
+          }
+        }, 2000)
+      } else {
+        vm.controlsNewReq[1] = 1
+      }
+
+    },
     keydown: (ev) => {
+      // handels all key
       if (document.querySelector('.videoplayer-vue').style.display == 'block') {
         let videl = document.querySelector('#videoplayer-shaka')
         let key = ev.keyCode

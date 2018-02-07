@@ -1,4 +1,4 @@
-<div class="videoplayer-vue" v-on:keydown="keydown">
+<div class="videoplayer-vue" v-on:keydown="keydown" v-on:mousemove="holdControls">
   <div class="player-wrapper">
     <video id="videoplayer-shaka"
     class="videoplayer-js"
@@ -8,7 +8,7 @@
     onclick="playPauseVideoPlayer()"
     autoplay></video>
   </div>
-  <div class="video-header">
+  <div class="video-header" v-bind:class="{hidden: controlsHidden}" v-on:mouseenter="forceControls(true)" v-on:mouseleave="forceControls(false)">
     <div class="back" v-on:click="closeplayer()">
       <svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
         <path d="M0 0h24v24H0z" fill="none"/>
@@ -17,7 +17,7 @@
     </div>
     <h1 class="vid-title" v-if="movie.name">{{ movie.name.replace(/\./g,' ') }}</h1>
   </div>
-  <div class="video-controls" v-if="shakaloaded">
+  <div class="video-controls" v-if="shakaloaded" v-bind:class="{hidden: controlsHidden}" v-on:mouseenter="forceControls(true)" v-on:mouseleave="forceControls(false)">
     <div class="playpause">
       <div class="play vid-btn" v-if="control.paused" v-on:click="play()">
         <svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
