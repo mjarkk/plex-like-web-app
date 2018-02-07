@@ -52,9 +52,11 @@ Open in a text editor **conf/servconfig.json**
 - serv/js.js :heavy_check_mark:
 - serv/sass.js :heavy_check_mark:
 - serv/database.js :heavy_check_mark:
-- serv/errorhandeler.js :question: (make the file but never tested if the file works)
+- serv/errorhandeler.js :heavy_check_mark:
+
 ### Windows
 - * :question: (Have not tested on windows)
+
 ### Mac OS
 - * :question: (Have not tested on Mac OS)
 
