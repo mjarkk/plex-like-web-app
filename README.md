@@ -44,7 +44,7 @@ Open in a text editor **conf/servconfig.json**
 - On windows the server will NOT stop running if you press ctrl + c, Solution: on windows open task manager and kill all nodejs services
 - If you change dev mode in the settings the server will not stop the live reload or will not start the live reload, Solution: manually restart the server.
 - If you see a lot of: [nodemon] files triggering change check: ```direcotry/withSome.file```, Solution: ```npm i -g nodemon@debug```
-- On linux (probably the same on mac and windows) chrome will eat you're RAM when working with the shaka player
+- On linux (probably the same on mac and windows) a lot of browsers will eat you're RAM when working with the shaka player
 - Sometimes the ```serv/video.js``` file will fail on start because the database is not ready  
 - Sometimes the ```serv/video.js``` file will re-render a complete video because the sha1 is not the same as last time
 
