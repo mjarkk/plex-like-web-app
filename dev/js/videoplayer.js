@@ -15,6 +15,7 @@ var moviePlayer = new Vue({
   data: {
     controlsHidden: true,
     controlsNewReq: [0,0,0],
+    isFullScreen: false,
     lasturl: '',
     player: {},
     control: {
@@ -31,6 +32,16 @@ var moviePlayer = new Vue({
     }
   },
   methods: {
+    fullscreen: (towhat) => {
+      let el = document.querySelector('.videoplayer-vue')
+      if (screenfull.enabled) {
+        if (typeof towhat == 'object' || typeof towhat == 'undefined') {
+          screenfull.toggle(el)
+        } else if (towhat == 'exit') {
+          screenfull.exit(el)
+        }
+      }
+    },
     forceControls: (input) => {
       moviePlayer.controlsNewReq[2] = (input) ? 1 : 0
     },
@@ -105,6 +116,7 @@ var moviePlayer = new Vue({
     closeplayer: () => {
       let mainel = document.querySelector('.videoplayer-vue')
       document.querySelector('#videoplayer-shaka').pause()
+      moviePlayer.fullscreen('exit')
       if (mainel.style.display != 'none') {
         UrlHandeler.changePath(moviePlayer.lasturl)
       }
@@ -227,7 +239,10 @@ var moviePlayer = new Vue({
     }
   },
   created: () => setTimeout( () => {
-
+    // add a event lissener that checks for fullscreen
+    screenfull.on('change', () =>
+      moviePlayer.isFullScreen = screenfull.isFullscreen
+    )
   }, 1)
 })
 

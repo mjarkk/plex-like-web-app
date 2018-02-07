@@ -152,7 +152,7 @@ var home = new Vue({
     },
     openmovie: (movie) => {
       document.querySelector('.videoplayer-vue').style.display = 'block'
-      reqfile('shaka-player-compiled-debug.videoplayer', () => {
+      reqfile('shaka-player-compiled-debug.screenfull.videoplayer', () => {
         moviePlayer.loadvideo(movie)
       })
       home.movies.ShowMoreInfo = false
