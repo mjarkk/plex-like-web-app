@@ -173,7 +173,11 @@ let filesloop = (index) => {
 let checkdb = () => {
   dba.getfileindex ? dirloop(0) : setTimeout(() => checkdb(), 1000)
 }
-checkdb()
+
+// only start compiling all images when this script is not required by a testing script
+if (!testingCode) {
+  checkdb()
+}
 
 // send a image to the user
 // data = {

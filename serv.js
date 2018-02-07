@@ -18,10 +18,10 @@ const compression = require('compression')
 const request = require('request')
 const ejs = require('ejs')
 const path = require('path')
-const CryptoJS = require('crypto-js')
-const moment = require('moment')
-const MongoClient = require('mongodb').MongoClient
 const app = express()
+
+// tell all the required script that this is NOT the testing code
+global.testingCode = false
 
 // replace console.log() with log()
 global.log = console.log

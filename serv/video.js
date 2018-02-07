@@ -365,7 +365,10 @@ let compile = (videofile, callback) => {
   })
 }
 
-dirloop(0)
+// only start compiling all images when this script is not required by a testing script
+if (!testingCode) {
+  dirloop(0)
+}
 
 // send video poster to the user
 // input = {
