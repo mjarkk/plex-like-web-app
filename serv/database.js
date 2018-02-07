@@ -53,7 +53,7 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
           ensuredb(arr, pos + 1)
         }
       })
-    } else {
+    } else if (!testingCode) {
       log(colors.green("Connected to database!"))
     }
   }

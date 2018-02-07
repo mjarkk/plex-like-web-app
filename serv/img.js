@@ -296,11 +296,11 @@ x.sendimg = (data) => {
 //   imgpath: <string (location of the image)>,
 //   quality: <number (from 100 to 0 don't have to include this)>,
 //   size: { <object (don't have to include this)>
-//     height: <number>
+//     height: <number>,
 //     width: <number>
-//   }
+//   },
 //   req: req, <object (from a express.js post message)>
-//   res: res, <object (from a express.js post message)>
+//   res: res <object (from a express.js post message)>
 // }
 x.SendImgPath = (data) => {
   if (data && data.res && data.req && typeof data.imgpath == 'string' && fs.existsSync(data.imgpath)) {

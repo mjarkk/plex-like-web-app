@@ -5,7 +5,7 @@
   "main": "serv.manager.js",
   "scripts": {
     "start": "node serv.manager.js",
-    "test": "ava"
+    "test": "ava --color test.js"
   },
   "author": "mjarkk",
   "license": "Apache-2.0",
