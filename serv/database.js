@@ -708,6 +708,43 @@ MongoClient.connect(globconf.dburl, (err, dbase) => {
     }
   }
 
+  x.removeImageJunk = (callback) => {
+    let requestamount = 50
+    let loop = (index) => {
+      db.collection('images')
+      .find()
+      .limit(requestamount)
+      .skip(requestamount * index)
+      .toArray((err, results) => {
+        let dune = () => {
+          if (results.length == requestamount) {
+            // go the next row of images when the length of the results is the same as `requestamount`
+            loop(index + 1)
+          } else if (typeof callback == 'function') {
+            callback({status: true})
+          }
+        }
+        let resultsLoop = (i) => {
+          let item = results[i]
+          if (item) {
+            if (fs.existsSync(item.filename)) {
+              resultsLoop(i + 1)
+            } else {
+              db.collection('images')
+              .remove({filename: {$in:[item.filename]}}, (err) => {
+                resultsLoop(i + 1)
+              })
+            }
+          } else {
+            dune()
+          }
+        }
+        resultsLoop(0)
+      })
+    }
+    loop(0)
+  }
+
   // encrypt function
   x.encrypt = (ToEncrypt,key) => {
     if (typeof(ToEncrypt) == 'object') {

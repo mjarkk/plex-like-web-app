@@ -165,8 +165,15 @@ let filesloop = (index) => {
       }
     }))
   } else {
-    log('dune checking all images')
+    log('Dune checking all images')
+    removeJunk()
   }
+}
+
+let removeJunk = () => {
+  dba.removeImageJunk((output) => {
+    log('Dune removeing all junk images')
+  })
 }
 
 // check if the database file is connected to the database

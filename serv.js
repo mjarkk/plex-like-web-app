@@ -37,6 +37,7 @@ global.globconf = require('./conf/servconfig.json')
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, '/routes'))
 app.use(express.static('./www/'))
+app.use(express.static('./static/'))
 app.use('/node', express.static('./node_modules/'))
 app.use(bodyParser.json(true))
 app.use(bodyParser.urlencoded({extended: true}))
@@ -263,7 +264,12 @@ app.get('*', (req, res, next) => {
 
 // if noting is found send a 404
 app.get('*', (req, res) => {
-  res.send('Error 404')
+  res.render('error',{
+    error: 404,
+    info: 'page not found',
+    jsfiles: ['error'],
+    page: 'error'
+  })
 })
 
 // a route for sending the settings config
